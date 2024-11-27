@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "UAS-CGA-William.sln"
+    "dotnet.defaultSolution": "UAS-CGA-William.sln",
+    "dotnet.preferCSharpExtension": true
 }
