@@ -398,7 +398,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 9dd0685b8b741894386dbe1d5975c6d3, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fe1e814cf4a00c4ca06964052fdbd7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 3
   rotationSpeed: 100
 --- !u!54 &1157568498
 Rigidbody:
@@ -595,7 +595,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 61897a93377d4a84ba2c07249db7df18, type: 2}
     - target: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
       propertyPath: m_Name
-      value: pacman (1)
+      value: Pacman
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
