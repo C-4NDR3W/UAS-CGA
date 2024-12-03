@@ -69,6 +69,7 @@ public class DungeonGenerator : MonoBehaviour
     public Vector2Int size;
     public int startPos = 0;
     public Rule[] rooms;
+    public Rule stairsRoom;
     public Vector2 offset;
 
     List<Cell> board;
@@ -118,16 +119,14 @@ public class DungeonGenerator : MonoBehaviour
                             randomRoom = 0;
                         }
                     }
-
-
                     var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
-                    newRoom.name += " " + i + "-" + j;
+                    newRoom.name += $" {i}-{j}";
 
                 }
             }
         }
-
+        PlaceStairsRoom();
         SpawnOrRelocatePacman();
     }
 
@@ -249,4 +248,61 @@ public class DungeonGenerator : MonoBehaviour
 
         return neighbors;
     }
+
+    void PlaceStairsRoom()
+    {
+        if (stairsRoom == null || stairsRoom.room == null)
+        {
+            Debug.LogError("Stairs room prefab is not assigned!");
+            return;
+        }
+
+        // Find eligible cells for stairs placement
+        List<int> eligibleCells = new List<int>();
+        for (int i = 0; i < board.Count; i++)
+        {
+            if (board[i].visited && i != startPos) // Exclude the starting position
+            {
+                eligibleCells.Add(i);
+            }
+        }
+
+        if (eligibleCells.Count == 0)
+        {
+            Debug.LogError("No eligible cells for stairs room!");
+            return;
+        }
+
+        // Pick a random eligible cell
+        int randomIndex = eligibleCells[Random.Range(0, eligibleCells.Count)];
+        Vector2Int position = new Vector2Int(randomIndex % size.x, randomIndex / size.x);
+
+        // Instantiate the stairs room
+        var stairsRoomInstance = Instantiate(stairsRoom.room,
+                                             new Vector3(position.x * offset.x, 0, -position.y * offset.y),
+                                             Quaternion.identity, transform);
+        stairsRoomInstance.name = "Stairs Room";
+
+        // Get the RoomBehaviour and update doors/walls based on neighbors
+        RoomBehaviour roomBehaviour = stairsRoomInstance.GetComponent<RoomBehaviour>();
+        if (roomBehaviour != null)
+        {
+            bool[] status = new bool[4];
+
+            // Check neighbors and update connections
+            status[0] = randomIndex - size.x >= 0 && board[randomIndex - size.x].visited; // Up
+            status[1] = randomIndex + size.x < board.Count && board[randomIndex + size.x].visited; // Down
+            status[2] = (randomIndex + 1) % size.x != 0 && board[randomIndex + 1].visited; // Right
+            status[3] = randomIndex % size.x != 0 && board[randomIndex - 1].visited; // Left
+
+            roomBehaviour.UpdateRoom(status);
+
+            Debug.Log($"Stairs Room placed with entrances: Up={status[0]}, Down={status[1]}, Right={status[2]}, Left={status[3]}");
+        }
+        else
+        {
+            Debug.LogError("Stairs room prefab is missing a RoomBehaviour component!");
+        }
+    }
+
 }
