@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 516762562494027856}
   - component: {fileID: 659176471822380236}
   - component: {fileID: 8678054020728168383}
+  - component: {fileID: 7226974578226085763}
   m_Layer: 0
   m_Name: Up Wall
   m_TagString: Untagged
@@ -181,6 +182,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls: []
   doors: []
+--- !u!65 &7226974578226085763
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205055088516546817}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2.9990404, z: 0.39999998}
+  m_Center: {x: 0.00000023841858, y: 1.5004798, z: 0}
 --- !u!1 &879070407091811269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1383,6 +1405,7 @@ GameObject:
   - component: {fileID: 5145372453423688537}
   - component: {fileID: 5288982630305357765}
   - component: {fileID: 5073212019571664940}
+  - component: {fileID: 9081361464068297079}
   m_Layer: 0
   m_Name: Right Wall
   m_TagString: Untagged
@@ -1469,6 +1492,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls: []
   doors: []
+--- !u!65 &9081361464068297079
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4799536103094825480}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.0000005, y: 2.9990404, z: 0.40000007}
+  m_Center: {x: 0.00000023841864, y: 1.5004798, z: 0}
 --- !u!1 &4899107854144449738
 GameObject:
   m_ObjectHideFlags: 0
@@ -2464,6 +2508,7 @@ GameObject:
   - component: {fileID: 7124270393417675611}
   - component: {fileID: 7840849962208839623}
   - component: {fileID: 8430617360484133586}
+  - component: {fileID: 1589876984278592959}
   m_Layer: 0
   m_Name: Left Wall
   m_TagString: Untagged
@@ -2550,6 +2595,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls: []
   doors: []
+--- !u!65 &1589876984278592959
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7434623270814034442}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.0000005, y: 2.9990404, z: 0.40000007}
+  m_Center: {x: 0.00000023841864, y: 1.5004798, z: 0}
 --- !u!1 &7715900357930563709
 GameObject:
   m_ObjectHideFlags: 0
@@ -2562,6 +2628,7 @@ GameObject:
   - component: {fileID: 7991367241444991276}
   - component: {fileID: 6983182485029672368}
   - component: {fileID: 8990797627908546241}
+  - component: {fileID: 7923081789593612465}
   m_Layer: 0
   m_Name: Down Wall
   m_TagString: Untagged
@@ -2648,6 +2715,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walls: []
   doors: []
+--- !u!65 &7923081789593612465
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7715900357930563709}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2.9990404, z: 0.39999998}
+  m_Center: {x: 0.00000023841858, y: 1.5004798, z: 0}
 --- !u!1 &8080063239918502842
 GameObject:
   m_ObjectHideFlags: 0
