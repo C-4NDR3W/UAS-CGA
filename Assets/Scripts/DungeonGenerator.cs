@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject pacmanPrefab;
+    public GameObject ghostPrefab;
+    public int numberOfGhosts = 4;
+
     void SpawnOrRelocatePacman()
     {
         GameObject existingPacman = GameObject.FindGameObjectWithTag("Pacman");
@@ -36,6 +38,41 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
         return Vector3.zero;
+    }
+
+    void SpawnGhosts()
+    {
+        List<Vector3> spawnPositions = new List<Vector3>();
+
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    Vector3 spawnPosition = new Vector3(i * offset.x, 0, -j * offset.y);
+                    spawnPositions.Add(spawnPosition);
+                }
+            }
+        }
+
+        // Ensure spawn positions exclude Pacman's location
+        GameObject pacman = GameObject.FindGameObjectWithTag("Pacman");
+        if (pacman != null)
+        {
+            spawnPositions.RemoveAll(pos => Vector3.Distance(pos, pacman.transform.position) < 1e-3f); // Adjust tolerance if needed
+        }
+
+        // Randomly spawn ghosts in different rooms
+        for (int k = 0; k < numberOfGhosts; k++)
+        {
+            if (spawnPositions.Count == 0) break; // No more rooms available
+
+            int randomIndex = Random.Range(0, spawnPositions.Count);
+            Instantiate(ghostPrefab, spawnPositions[randomIndex], Quaternion.identity);
+            spawnPositions.RemoveAt(randomIndex); // Ensure unique spawn positions for ghosts
+        }
     }
 
     public class Cell
@@ -129,6 +166,7 @@ public class DungeonGenerator : MonoBehaviour
         }
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
+        SpawnGhosts();
     }
 
     void MazeGenerator()
