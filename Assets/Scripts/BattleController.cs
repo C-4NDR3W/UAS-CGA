@@ -40,13 +40,19 @@ public class BattleController : MonoBehaviour
         }
 
         // New position to relocate Pacman
-        Vector3 newPosition = new Vector3(13.67f, 28.52f, 6.076f);
+        Vector3 newPosition = new Vector3(15.322f, 27.94f, 4.538f);
 
         // Move Pacman to the new position
         pacman.transform.position = newPosition;
 
         // Set Pacman's rotation to (0, 160, 0)
-        pacman.transform.rotation = Quaternion.Euler(0f, 140f, 0f);
+        pacman.transform.rotation = Quaternion.Euler(0f, 135f, 0f);
+
+        Vector3 newGhostPosition = new Vector3(18.25f, 28.17f, 1.85f);
+        Quaternion newGhostRotation = Quaternion.Euler(0f, -45f, 0f);
+        gameObject.transform.position = newGhostPosition;
+        gameObject.transform.rotation = newGhostRotation;
+
 
         // Wait for 5 seconds
         yield return new WaitForSeconds(5f);
