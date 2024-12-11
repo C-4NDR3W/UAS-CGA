@@ -16,6 +16,8 @@ public class DungeonGenerator : MonoBehaviour
 
     private List<Cell> board;
 
+    public bool isBattleScene = false; 
+
     public class Cell
     {
         public bool visited = false;
@@ -315,7 +317,24 @@ public class DungeonGenerator : MonoBehaviour
             if (ghostPrefabs.Length > 0)
             {
                 int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
-                Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
+                GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
+
+                GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
+                if (ghostBehaviour != null)
+                {
+                    if (isBattleScene)
+                    {
+                        ghostBehaviour.enabled = false;
+                    }
+                    else
+                    {
+                        ghostBehaviour.movementPattern = (Random.Range(0, 2) == 0) ? GhostBehaviour.MovementPattern.Square : GhostBehaviour.MovementPattern.FollowPacman;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Ghost prefab tidak memiliki komponen GhostBehaviour!");
+                }
             }
             else
             {
