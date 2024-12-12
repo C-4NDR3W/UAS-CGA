@@ -310,8 +310,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  movementPattern: 0
+  moveSpeed: 3
+  movementPattern: 1
 --- !u!1001 &798960236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -492,8 +492,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1157568495}
   offset: {x: 0, y: 0, z: 0}
-  sensitivity: 300
   distance: 3
+  minDistance: 1
+  maxDistance: 5
+  zoomSpeed: 2
+  wallDistance: 0.5
 --- !u!1001 &1043582689
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -697,8 +700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  movementPattern: 0
+  moveSpeed: 3
+  movementPattern: 1
 --- !u!1 &1157568494 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
@@ -1161,8 +1164,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  movementPattern: 0
+  moveSpeed: 3
+  movementPattern: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

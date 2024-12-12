@@ -18,10 +18,10 @@ public class GhostBehaviour : MonoBehaviour
         pacman = GameObject.FindGameObjectWithTag("Pacman");
         squareWaypoints = new Vector3[]
         {
-            new Vector3(5, 0, 5),
-            new Vector3(4, 0, -4),
-            new Vector3(-4, 0, -3),
-            new Vector3(-4, 0, 4)
+            new Vector3(-6, 0, -6),
+            new Vector3(-6, 0, 6),
+            new Vector3(6, 0, -6),
+            new Vector3(6, 0, 6)
         };
 
         Quaternion rotation = Quaternion.Euler(0, -40, 0);
@@ -40,21 +40,11 @@ public class GhostBehaviour : MonoBehaviour
     {
         if (pacman != null)
         {
-            if (movementPattern == MovementPattern.FollowPacman)
-            {
-                FollowPacman();
-            }
-            else if (movementPattern == MovementPattern.Square && movementCoroutine == null)
+            if (movementPattern == MovementPattern.Square && movementCoroutine == null)
             {
                 movementCoroutine = StartCoroutine(MoveInSquare());
             }
         }
-    }
-
-    void FollowPacman()
-    {
-        Vector3 direction = (pacman.transform.position - transform.position).normalized;
-        transform.position += direction * moveSpeed * Time.deltaTime;
     }
 
     IEnumerator MoveInSquare()

@@ -277,69 +277,57 @@ public class DungeonGenerator : MonoBehaviour
                 Cell currentCell = board[(i + j * size.x)];
                 if (currentCell.visited)
                 {
-                    return new Vector3(i * offset.x, 0, -j * offset.y);
+                    // Calculate the center of the room
+                    float centerX = (i * offset.x) + offset.x / 2f;
+                    float centerZ = (-j * offset.y) - offset.y / 2f;
+                    return new Vector3(centerX, 0, centerZ);
                 }
             }
         }
         return Vector3.zero;
     }
-
-    void SpawnGhosts()
-    {
-        List<Vector3> spawnPositions = new List<Vector3>();
-
-        for (int i = 0; i < size.x; i++)
+        void SpawnGhosts()
         {
-            for (int j = 0; j < size.y; j++)
+            List<Vector3> spawnPositions = new List<Vector3>();
+
+            for (int i = 0; i < size.x; i++)
             {
-                Cell currentCell = board[(i + j * size.x)];
-                if (currentCell.visited)
+                for (int j = 0; j < size.y; j++)
                 {
-                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
-                }
-            }
-        }
-
-        GameObject pacman = GameObject.FindGameObjectWithTag("Pacman");
-        if (pacman != null)
-        {
-            spawnPositions.RemoveAll(pos => Vector3.Distance(pos, pacman.transform.position) < 1e-3f);
-        }
-
-        for (int k = 0; k < numberOfGhosts; k++)
-        {
-            if (spawnPositions.Count == 0) break;
-
-            int randomIndex = Random.Range(0, spawnPositions.Count);
-            Vector3 spawnPosition = spawnPositions[randomIndex];
-            spawnPositions.RemoveAt(randomIndex);
-
-            if (ghostPrefabs.Length > 0)
-            {
-                int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
-                GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
-
-                GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
-                if (ghostBehaviour != null)
-                {
-                    if (isBattleScene)
+                    Cell currentCell = board[(i + j * size.x)];
+                    if (currentCell.visited)
                     {
-                        ghostBehaviour.enabled = false;
-                    }
-                    else
-                    {
-                        ghostBehaviour.movementPattern = (Random.Range(0, 2) == 0) ? GhostBehaviour.MovementPattern.Square : GhostBehaviour.MovementPattern.FollowPacman;
+                        spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
                     }
                 }
-                else
-                {
-                    Debug.LogError("Ghost prefab tidak memiliki komponen GhostBehaviour!");
-                }
             }
-            else
+
+            for (int k = 0; k < numberOfGhosts; k++)
             {
-                Debug.LogError("Ghost prefabs array is empty!");
+                if (spawnPositions.Count == 0) break;
+
+                int randomIndex = Random.Range(0, spawnPositions.Count);
+                Vector3 spawnPosition = spawnPositions[randomIndex];
+                spawnPositions.RemoveAt(randomIndex);
+
+                if (ghostPrefabs.Length > 0)
+                {
+                    int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
+                    GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
+
+                    GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
+                    if (ghostBehaviour != null)
+                    {
+                        if (isBattleScene)
+                        {
+                            ghostBehaviour.enabled = false;
+                        }
+                        else
+                        {
+                            ghostBehaviour.movementPattern = (Random.Range(0, 2) == 0) ? GhostBehaviour.MovementPattern.Square : GhostBehaviour.MovementPattern.FollowPacman;
+                        }
+                    }
+                }
             }
         }
     }
-}
