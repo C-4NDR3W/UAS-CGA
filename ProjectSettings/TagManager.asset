@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pacman
   - Ghost
+  - Wall
   layers:
   - Default
   - TransparentFX

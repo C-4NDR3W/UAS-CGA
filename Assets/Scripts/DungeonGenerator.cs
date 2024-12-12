@@ -277,16 +277,14 @@ public class DungeonGenerator : MonoBehaviour
                 Cell currentCell = board[(i + j * size.x)];
                 if (currentCell.visited)
                 {
-                    // Calculate the center of the room
-                    float centerX = (i * offset.x) + offset.x / 2f;
-                    float centerZ = (-j * offset.y) - offset.y / 2f;
-                    return new Vector3(centerX, 0, centerZ);
+                    return new Vector3(i * offset.x, 0, -j * offset.y);
                 }
             }
         }
         return Vector3.zero;
     }
-        void SpawnGhosts()
+
+    void SpawnGhosts()
         {
             List<Vector3> spawnPositions = new List<Vector3>();
 
@@ -321,10 +319,6 @@ public class DungeonGenerator : MonoBehaviour
                         if (isBattleScene)
                         {
                             ghostBehaviour.enabled = false;
-                        }
-                        else
-                        {
-                            ghostBehaviour.movementPattern = (Random.Range(0, 2) == 0) ? GhostBehaviour.MovementPattern.Square : GhostBehaviour.MovementPattern.FollowPacman;
                         }
                     }
                 }

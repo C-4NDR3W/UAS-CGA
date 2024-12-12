@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BattleController : MonoBehaviour
 {
@@ -7,11 +8,17 @@ public class BattleController : MonoBehaviour
     private Quaternion originalRotation; // To store the original rotation of Pacman
     private bool isPacmanRelocating = false; // To prevent multiple simultaneous relocations
     private PlayerMovement playerMovement; // Reference to Pacman's movement script (PlayerMovement)
+    public bool isBattle = false; // Bool to check if the battle is active
+    private Animator pacmanAnimator; // Reference to Pacman's Animator component
+    public GameObject battleUIPanel; // Reference to the UI Panel for the battle
+
 
     private void Start()
     {
-        // Try to get the PlayerMovement script attached to Pacman
-        playerMovement = FindObjectOfType<PlayerMovement>(); // Adjust if PlayerMovement is on a different object
+        if (battleUIPanel != null)
+        {
+            battleUIPanel.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -20,6 +27,16 @@ public class BattleController : MonoBehaviour
         {
             if (!isPacmanRelocating)
             {
+                isBattle = true; // Set isBattle to true when Pacman collides with a ghost
+
+                pacmanAnimator = other.GetComponent<Animator>();
+                playerMovement = other.GetComponent<PlayerMovement>();
+
+                if (battleUIPanel != null && isBattle == true)
+                {
+                    pacmanAnimator.SetBool("isWalking", false);
+                    battleUIPanel.SetActive(true); // Show the battle UI panel
+                }
                 StartCoroutine(TemporarilyRelocatePacman(other.gameObject));
             }
         }
@@ -70,8 +87,9 @@ public class BattleController : MonoBehaviour
             playerMovement.enabled = true;
         }
 
+        isBattle = false;
+        battleUIPanel.SetActive(false);
         isPacmanRelocating = false;
-
         Destroy(gameObject);
     }
 }
