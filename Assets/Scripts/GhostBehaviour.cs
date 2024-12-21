@@ -1,37 +1,47 @@
+using System.Collections;
 using UnityEngine;
 
 public class GhostBehaviour : MonoBehaviour
 {
-    public float moveSpeed = 2f; // Speed of the ghost
-    private Vector3 direction;  // Direction of movement
+    public float speed = 3f; 
+    public float edgeLength = 3f;
 
-    void Start()
+    private Vector3 startPosition;
+    private Vector3[] directions;
+    private int currentDirectionIndex = 0;
+
+    private void Start()
     {
-        // Generate a random initial direction
-        direction = GetRandomDirection();
+        startPosition = transform.position; 
+        InitializeDirections();
+        StartCoroutine(MoveInSquare());
     }
 
-    void Update()
+    void InitializeDirections()
     {
-        // Move the ghost in the current direction
-        transform.position += direction * moveSpeed * Time.deltaTime;
+        directions = new Vector3[] {
+            new Vector3(2, 0, 0) * edgeLength, // kanan
+            new Vector3(0, 0, 2) * edgeLength, // maju
+            new Vector3(-2, 0, 0) * edgeLength, // kiri
+            new Vector3(0, 0, -2) * edgeLength  // mundur
+        };
     }
 
-    void OnCollisionEnter(Collision collision)
+    private IEnumerator MoveInSquare()
     {
-        // Check if the collision is with a wall
-        if (collision.gameObject.CompareTag("Wall"))
+        Vector3 nextPosition = startPosition;
+
+        while (true)
         {
-            // Reflect the current direction based on the collision normal
-            direction = Vector3.Reflect(direction, collision.contacts[0].normal);
-        }
-    }
+            nextPosition += directions[currentDirectionIndex];
+            while (Vector3.Distance(transform.position, nextPosition) > 0.1f)
+            {
+                Vector3 direction = (nextPosition - transform.position).normalized;
+                transform.position += direction * speed * Time.deltaTime;
+                yield return null;
+            }
 
-    Vector3 GetRandomDirection()
-    {
-        // Generate a random direction vector
-        float x = Random.Range(-1f, 1f);
-        float z = Random.Range(-1f, 1f);
-        return new Vector3(x, 0, z).normalized;
+            currentDirectionIndex = (currentDirectionIndex + 1) % directions.Length;
+        }
     }
 }

@@ -503,7 +503,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0
+  speed: 2
+  edgeLength: 3
 --- !u!1001 &798960236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1275,7 +1276,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0
+  speed: 2
+  edgeLength: 3
 --- !u!1 &1117563892
 GameObject:
   m_ObjectHideFlags: 0
@@ -2554,7 +2556,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35671ecd2e91cbd41a413675ac22b396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0
+  speed: 2
+  edgeLength: 3
 --- !u!1 &2147284062
 GameObject:
   m_ObjectHideFlags: 0
