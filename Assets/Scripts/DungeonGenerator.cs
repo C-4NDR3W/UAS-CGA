@@ -285,7 +285,7 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     void SpawnGhosts()
-        {
+    {
             List<Vector3> spawnPositions = new List<Vector3>();
 
             for (int i = 0; i < size.x; i++)
