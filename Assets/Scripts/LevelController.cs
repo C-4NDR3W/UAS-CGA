@@ -9,7 +9,7 @@ public class LevelController : MonoBehaviour
     {
         if (other.CompareTag("Pacman"))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
 }

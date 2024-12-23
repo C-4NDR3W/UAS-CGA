@@ -1597,7 +1597,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4609626232690111806}
-  - component: {fileID: 7396408830477394657}
+  - component: {fileID: 9212493885609763835}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
@@ -1645,7 +1645,7 @@ Transform:
   - {fileID: 221738064636378539}
   m_Father: {fileID: 8852237807667617800}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7396408830477394657
+--- !u!65 &9212493885609763835
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
