@@ -15,6 +15,11 @@ public class BattleController : MonoBehaviour
 
     private void Start()
     {
+        if (battleUIPanel == null) 
+        {
+            battleUIPanel = InGameUI.Instance.battleUIPanel;
+        }
+
         if (battleUIPanel != null)
         {
             battleUIPanel.SetActive(false);
@@ -37,7 +42,15 @@ public class BattleController : MonoBehaviour
                     pacmanAnimator.SetBool("isWalking", false);
                     battleUIPanel.SetActive(true); // Show the battle UI panel
                 }
+
+
+
+                PlayerStats.Instance.TakeDamage(10);
+
+
+
                 StartCoroutine(TemporarilyRelocatePacman(other.gameObject));
+                PlayerStats.Instance.AddCoins();
             }
         }
     }
