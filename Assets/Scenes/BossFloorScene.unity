@@ -300,6 +300,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1969819650}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1969819655}
   m_SourcePrefab: {fileID: 100100000, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
 --- !u!1 &181877716
 GameObject:
@@ -3852,6 +3855,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
   m_PrefabInstance: {fileID: 86211456}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1969819655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1969819649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc1db914d75703542b79f5f3d06d6bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  attackPower: 10
+  coins: 0
+  healthBar: {fileID: 1343662814}
+  coinText: {fileID: 1664953839}
 --- !u!1 &2079635517
 GameObject:
   m_ObjectHideFlags: 0
