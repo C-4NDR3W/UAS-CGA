@@ -36,10 +36,11 @@ public class PlayerStats : MonoBehaviour
         healthBar.SetHealth(currentHealth);
     }
 
-    public void AddCoins()
+    public void AddCoins(float multiplier = 1.0f)
     {
         int amount = Random.Range(1, 11);
-        coins += amount;
+        int totalReward = Mathf.CeilToInt(amount * multiplier); // Apply multiplier
+        coins += totalReward;
         UpdateCoinUI();
     }
 
@@ -50,4 +51,4 @@ public class PlayerStats : MonoBehaviour
             coinText.text = coins.ToString();
         }
     }
-}   
+}

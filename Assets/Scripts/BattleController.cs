@@ -11,6 +11,7 @@ public class BattleController : MonoBehaviour
     public bool isBattle = false; // Bool to check if the battle is active
     private Animator pacmanAnimator; // Reference to Pacman's Animator component
     public GameObject battleUIPanel; // Reference to the UI Panel for the battle
+    public GameObject treasureChest;
 
 
     private void Start()
@@ -28,34 +29,19 @@ public class BattleController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Pacman") && gameObject.CompareTag("Ghost"))
+        if (other.CompareTag("Pacman"))
         {
-            if (!isPacmanRelocating)
+            if (gameObject.CompareTag("Ghost"))
             {
-                isBattle = true; // Set isBattle to true when Pacman collides with a ghost
-
-                pacmanAnimator = other.GetComponent<Animator>();
-                playerMovement = other.GetComponent<PlayerMovement>();
-
-                if (battleUIPanel != null && isBattle == true)
-                {
-                    pacmanAnimator.SetBool("isWalking", false);
-                    battleUIPanel.SetActive(true); // Show the battle UI panel
-                }
-
-
-                PlayerStats.Instance.TakeDamage(10);
-
-                GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
-                if (ghostBehaviour != null)
-                {
-                    ghostBehaviour.SetMovement(false);
-                }
-
-
-
-                StartCoroutine(TemporarilyRelocatePacman(other.gameObject));
-                PlayerStats.Instance.AddCoins();
+                // Ghost collision: 10 damage, 1 coin, no treasure chest
+                HandleEnemyCollision(other.gameObject, damage: 10, goldMult: 1);
+            }
+            else if (gameObject.CompareTag("Boss"))
+            {
+                // Boss collision: 50 damage, 100 coins, spawn treasure chest
+                //reminder change damage prolly for this
+                HandleEnemyCollision(other.gameObject, damage: 50, goldMult: 11);
+                RelocateTreasureChest();
             }
         }
     }
@@ -110,4 +96,40 @@ public class BattleController : MonoBehaviour
         isPacmanRelocating = false;
         Destroy(gameObject);
     }
+
+    void HandleEnemyCollision(GameObject pacman, int damage, int goldMult)
+    {
+        if (!isPacmanRelocating)
+        {
+            isBattle = true;
+
+            // Set Pacman's state
+            pacmanAnimator = pacman.GetComponent<Animator>();
+            playerMovement = pacman.GetComponent<PlayerMovement>();
+
+            if (battleUIPanel != null && isBattle)
+            {
+                pacmanAnimator.SetBool("isWalking", false);
+                battleUIPanel.SetActive(true); // Show the battle UI panel
+            }
+
+            // Apply damage and reward
+            PlayerStats.Instance.TakeDamage(damage);
+            PlayerStats.Instance.AddCoins(goldMult);
+
+            // Handle temporary relocation
+            StartCoroutine(TemporarilyRelocatePacman(pacman));
+        }
+    }
+
+    void RelocateTreasureChest()
+    {
+        if (treasureChest != null && gameObject.CompareTag("Boss"))
+        {
+            treasureChest.transform.position = transform.position + new Vector3(0, 1, 0); // Move chest to boss position
+            treasureChest.SetActive(true);
+        }
+    }
+
+
 }
