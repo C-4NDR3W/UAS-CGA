@@ -213,7 +213,7 @@ public class DungeonGenerator : MonoBehaviour
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
         SpawnGhosts();
-        SpawnMissPacman(roomCenters);
+        SpawnMissPacman();
     }
 
     void PlaceStairsRoom()
@@ -335,15 +335,27 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-    void SpawnMissPacman(List<Vector3> roomCenters)
+    void SpawnMissPacman()
     {
-        if (roomCenters.Count > 0)
-        {
-            // Pick a random room center for MissPacman
-            int randomIndex = Random.Range(0, roomCenters.Count);
-            Vector3 spawnPosition = roomCenters[randomIndex];
+        List<Vector3> spawnPositions = new List<Vector3>();
 
-            // Instantiate MissPacman at the random room center
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
+                }
+            }
+        }
+
+        if (spawnPositions.Count > 0)
+        {
+            int randomIndex = Random.Range(0, spawnPositions.Count);
+            Vector3 spawnPosition = spawnPositions[randomIndex];
+
             GameObject missPacman = Instantiate(missPacmanPrefab, spawnPosition, Quaternion.identity);
         }
     }

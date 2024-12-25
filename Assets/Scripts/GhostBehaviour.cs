@@ -13,7 +13,7 @@ public class GhostBehaviour : MonoBehaviour
 
     private void Start()
     {
-        startPosition = transform.position;
+        startPosition = transform.position + new Vector3(-2.0f, 0, 0); 
         InitializeDirections();
         StartCoroutine(MoveInSquare());
     }
@@ -21,10 +21,10 @@ public class GhostBehaviour : MonoBehaviour
     void InitializeDirections()
     {
         directions = new Vector3[] {
-            new Vector3(2, 0, 0) * edgeLength, // kanan
-            new Vector3(0, 0, 2) * edgeLength, // maju
-            new Vector3(-2, 0, 0) * edgeLength, // kiri
-            new Vector3(0, 0, -2) * edgeLength  // mundur
+            new Vector3(2.6f, 0, 0) * edgeLength, // kanan
+            new Vector3(0, 0, 2.6f) * edgeLength, // maju
+            new Vector3(-2.6f, 0, 0) * edgeLength, // kiri
+            new Vector3(0, 0, -2.6f) * edgeLength  // mundur
         };
     }
 
