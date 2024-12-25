@@ -15,7 +15,7 @@ public class BattleController : MonoBehaviour
 
     private void Start()
     {
-        if (battleUIPanel == null) 
+        if (battleUIPanel == null)
         {
             battleUIPanel = InGameUI.Instance.battleUIPanel;
         }
@@ -44,8 +44,13 @@ public class BattleController : MonoBehaviour
                 }
 
 
-
                 PlayerStats.Instance.TakeDamage(10);
+
+                GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
+                if (ghostBehaviour != null)
+                {
+                    ghostBehaviour.SetMovement(false);
+                }
 
 
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject pacmanPrefab;
+    public GameObject missPacmanPrefab;
     public GameObject[] ghostPrefabs; // Array untuk semua prefab ghost
     public int numberOfGhosts = 4;
 
@@ -157,6 +158,8 @@ public class DungeonGenerator : MonoBehaviour
 
     void GenerateDungeon()
     {
+        List<Vector3> roomCenters = new List<Vector3>();
+
         for (int i = 0; i < size.x; i++)
         {
             for (int j = 0; j < size.y; j++)
@@ -197,6 +200,12 @@ public class DungeonGenerator : MonoBehaviour
                     var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
                     newRoom.name += $" {i}-{j}";
+
+                    Vector3 roomCenter = new Vector3(
+                    (rooms[randomRoom].minPosition.x + rooms[randomRoom].maxPosition.x) / 2.0f * offset.x,
+                    0,
+                    -(rooms[randomRoom].minPosition.y + rooms[randomRoom].maxPosition.y) / 2.0f * offset.y);
+                    roomCenters.Add(roomCenter);
                 }
             }
         }
@@ -204,6 +213,7 @@ public class DungeonGenerator : MonoBehaviour
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
         SpawnGhosts();
+        SpawnMissPacman(roomCenters);
     }
 
     void PlaceStairsRoom()
@@ -324,4 +334,17 @@ public class DungeonGenerator : MonoBehaviour
                 }
             }
         }
+
+    void SpawnMissPacman(List<Vector3> roomCenters)
+    {
+        if (roomCenters.Count > 0)
+        {
+            // Pick a random room center for MissPacman
+            int randomIndex = Random.Range(0, roomCenters.Count);
+            Vector3 spawnPosition = roomCenters[randomIndex];
+
+            // Instantiate MissPacman at the random room center
+            GameObject missPacman = Instantiate(missPacmanPrefab, spawnPosition, Quaternion.identity);
+        }
     }
+}
