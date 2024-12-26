@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
+
 public class BattleController : MonoBehaviour
 {
     private Vector3 originalPosition; // To store the original position of Pacman
@@ -12,6 +14,8 @@ public class BattleController : MonoBehaviour
     private Animator pacmanAnimator; // Reference to Pacman's Animator component
     public GameObject battleUIPanel; // Reference to the UI Panel for the battle
     public GameObject treasureChest;
+    public BattleState state;
+    private EnemyStats enemyStats;
 
 
     private void Start()
@@ -49,6 +53,7 @@ public class BattleController : MonoBehaviour
     private IEnumerator TemporarilyRelocatePacman(GameObject pacman)
     {
         isPacmanRelocating = true;
+        state = BattleState.START;
 
         // Store the original position of Pacman
         originalPosition = pacman.transform.position;
@@ -73,29 +78,42 @@ public class BattleController : MonoBehaviour
         Quaternion newGhostRotation = Quaternion.Euler(0f, -45f, 0f);
         gameObject.transform.position = newGhostPosition;
         gameObject.transform.rotation = newGhostRotation;
-
-
-        // Wait for 5 seconds
-        yield return new WaitForSeconds(5f);
-
-        // Check if the original position is valid and return Pacman to it
-        if (originalPosition != Vector3.zero)
+        GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
+        if (ghostBehaviour != null)
         {
-            pacman.transform.position = originalPosition;
-            pacman.transform.rotation = originalRotation;
+            ghostBehaviour.SetMovement(false);
         }
 
-        // Re-enable Pacman's movement
-        if (playerMovement != null)
+        enemyStats = gameObject.GetComponent<EnemyStats>();
+        if (enemyStats != null)
         {
-            playerMovement.enabled = true;
+            int playerLevel = PlayerStats.Instance.level; // Get player's level
+            enemyStats.Initialize(playerLevel);
         }
 
-        isBattle = false;
-        battleUIPanel.SetActive(false);
-        isPacmanRelocating = false;
-        Destroy(gameObject);
-        PlayerStats.Instance.AddCoins(1);
+        yield return new WaitForSeconds(2f);
+
+        state = BattleState.PLAYERTURN;
+
+
+        // // Check if the original position is valid and return Pacman to it
+        // if (originalPosition != Vector3.zero)
+        // {
+        //     pacman.transform.position = originalPosition;
+        //     pacman.transform.rotation = originalRotation;
+        // }
+
+        // // Re-enable Pacman's movement
+        // if (playerMovement != null)
+        // {
+        //     playerMovement.enabled = true;
+        // }
+
+        // isBattle = false;
+        // battleUIPanel.SetActive(false);
+        // isPacmanRelocating = false;
+        // Destroy(gameObject);
+        // PlayerStats.Instance.AddCoins(1);
     }
 
     void HandleEnemyCollision(GameObject pacman, int damage)
@@ -131,5 +149,47 @@ public class BattleController : MonoBehaviour
         }
     }
 
+    public void onAttackButton()
+    {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        StartCoroutine(PlayerAttack());
+
+    }
+
+    IEnumerator PlayerAttack()
+    {
+        yield return new WaitForSeconds(1f);
+    }
+
+    public void onGuardButton()
+    {
+
+    }
+
+    IEnumerator PlayerGuard()
+    {
+        yield return new WaitForSeconds(2f);
+    }
+
+    public void onSkillButton()
+    {
+
+    }
+
+    IEnumerator PlayerSkill()
+    {
+        yield return new WaitForSeconds(2f);
+    }
+    public void onRunButton()
+    {
+
+    }
+    IEnumerator PlayerRun()
+    {
+        yield return new WaitForSeconds(2f);
+    }
 
 }

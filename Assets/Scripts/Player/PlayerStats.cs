@@ -10,6 +10,9 @@ public class PlayerStats : MonoBehaviour
     public int currentHealth;
     public int attackPower = 10;
     public int coins = 0;
+    public int level = 1;
+    public int xpPoints;
+    public int xpToNextLevel;
 
     public HealthBar healthBar;
     public TMP_Text coinText;
@@ -52,5 +55,25 @@ public class PlayerStats : MonoBehaviour
         {
             coinText.text = coins.ToString();
         }
+    }
+
+    public void AddExperience(int amount)
+    {
+        xpPoints += amount;
+
+        if (xpPoints >= xpToNextLevel)
+        {
+            LevelUp();
+        }
+    }
+
+    private void LevelUp()
+    {
+        level++;
+        xpPoints -= xpToNextLevel;
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.2f); // Scale XP needed
+        maxHealth += 20; // Increase HP on level up
+        attackPower += 5; // Increase attack power
+        currentHealth = maxHealth; // Fully heal the player
     }
 }
