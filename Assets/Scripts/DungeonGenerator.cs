@@ -5,7 +5,7 @@ using UnityEngine;
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject pacmanPrefab;
-    public GameObject missPacmanPrefab;
+    public GameObject pacmanDoctorPrefab;
     public GameObject[] ghostPrefabs; // Array untuk semua prefab ghost
     public int numberOfGhosts = 4;
 
@@ -213,7 +213,7 @@ public class DungeonGenerator : MonoBehaviour
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
         SpawnGhosts();
-        SpawnMissPacman();
+        SpawnPacmanDoctor();
     }
 
     void PlaceStairsRoom()
@@ -335,7 +335,7 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-    void SpawnMissPacman()
+    void SpawnPacmanDoctor()
     {
         List<Vector3> spawnPositions = new List<Vector3>();
 
@@ -346,7 +346,7 @@ public class DungeonGenerator : MonoBehaviour
                 Cell currentCell = board[(i + j * size.x)];
                 if (currentCell.visited)
                 {
-                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
+                    spawnPositions.Add(new Vector3(i * offset.x, 0.5f, -j * offset.y));
                 }
             }
         }
@@ -356,7 +356,7 @@ public class DungeonGenerator : MonoBehaviour
             int randomIndex = Random.Range(0, spawnPositions.Count);
             Vector3 spawnPosition = spawnPositions[randomIndex];
 
-            GameObject missPacman = Instantiate(missPacmanPrefab, spawnPosition, Quaternion.identity);
+            GameObject pacamanDoctor = Instantiate(pacmanDoctorPrefab, spawnPosition, Quaternion.identity);
         }
     }
 }

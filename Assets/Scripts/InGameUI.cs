@@ -6,6 +6,7 @@ public class InGameUI : MonoBehaviour
 {
     public static InGameUI Instance;
     public GameObject battleUIPanel;
+    public GameObject doctorUIPanel;
 
     void Awake()
     {

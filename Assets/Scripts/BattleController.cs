@@ -34,13 +34,13 @@ public class BattleController : MonoBehaviour
             if (gameObject.CompareTag("Ghost"))
             {
                 // Ghost collision: 10 damage, 1 coin, no treasure chest
-                HandleEnemyCollision(other.gameObject, damage: 10, goldMult: 1);
+                HandleEnemyCollision(other.gameObject, damage: 10);
             }
             else if (gameObject.CompareTag("Boss"))
             {
                 // Boss collision: 50 damage, 100 coins, spawn treasure chest
                 //reminder change damage prolly for this
-                HandleEnemyCollision(other.gameObject, damage: 50, goldMult: 11);
+                HandleEnemyCollision(other.gameObject, damage: 50);
                 RelocateTreasureChest();
             }
         }
@@ -95,9 +95,10 @@ public class BattleController : MonoBehaviour
         battleUIPanel.SetActive(false);
         isPacmanRelocating = false;
         Destroy(gameObject);
+        PlayerStats.Instance.AddCoins(1);
     }
 
-    void HandleEnemyCollision(GameObject pacman, int damage, int goldMult)
+    void HandleEnemyCollision(GameObject pacman, int damage)
     {
         if (!isPacmanRelocating)
         {
@@ -115,7 +116,6 @@ public class BattleController : MonoBehaviour
 
             // Apply damage and reward
             PlayerStats.Instance.TakeDamage(damage);
-            PlayerStats.Instance.AddCoins(goldMult);
 
             // Handle temporary relocation
             StartCoroutine(TemporarilyRelocatePacman(pacman));
