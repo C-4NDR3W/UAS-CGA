@@ -97,10 +97,10 @@ public class BattleController : MonoBehaviour
 
 
         // // Check if the original position is valid and return Pacman to it
-        // if (originalPosition != Vector3.zero)
+        // if (originalposition != vector3.zero)
         // {
-        //     pacman.transform.position = originalPosition;
-        //     pacman.transform.rotation = originalRotation;
+        //     pacman.transform.position = originalposition;
+        //     pacman.transform.rotation = originalrotation;
         // }
 
         // // Re-enable Pacman's movement
