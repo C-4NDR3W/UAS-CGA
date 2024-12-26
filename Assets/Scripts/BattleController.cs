@@ -34,7 +34,7 @@ public class BattleController : MonoBehaviour
             if (gameObject.CompareTag("Ghost"))
             {
                 // Ghost collision: 10 damage, 1 coin, no treasure chest
-                HandleEnemyCollision(other.gameObject, damage: 10);
+                HandleEnemyCollision(other.gameObject, damage: 2);
             }
             else if (gameObject.CompareTag("Boss"))
             {

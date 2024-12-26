@@ -30,16 +30,18 @@ public class PlayerStats : MonoBehaviour
         healthBar.SetHealth(currentHealth);
     }
 
-    public void Heal()
+    public void Heal(int cost)
     {
+        coins -= cost;
         currentHealth = maxHealth;
         healthBar.SetHealth(currentHealth);
+        UpdateCoinUI();
     }
 
     public void AddCoins(float multiplier = 1.0f)
     {
         int amount = Random.Range(1, 11);
-        int totalReward = Mathf.CeilToInt(amount * multiplier); // Apply multiplier
+        int totalReward = Mathf.CeilToInt(amount * multiplier); 
         coins += totalReward;
         UpdateCoinUI();
     }

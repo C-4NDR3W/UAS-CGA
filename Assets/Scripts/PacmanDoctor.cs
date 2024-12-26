@@ -11,8 +11,10 @@ public class PacmanDoctor : MonoBehaviour
     public GameObject buttons;
     public TMP_Text dialogText;     
     public Button yesButton;    
-    public Button noButton;    
+    public Button noButton;
+    private int cost = 0;
     private bool isPlayerNearby = false;
+    private bool isQuestionDialog = false;
 
     void Start()
     {
@@ -51,9 +53,14 @@ public class PacmanDoctor : MonoBehaviour
 
     void Update()
     {
-        if (isPlayerNearby && Input.GetKeyDown(KeyCode.Space))
+        if (isPlayerNearby && Input.GetKeyDown(KeyCode.Space) && !isQuestionDialog)
         {
             ShowDialog();
+        }
+        else if (isQuestionDialog && Input.GetKeyDown(KeyCode.Space))
+        {
+            ShowButtons();
+            isQuestionDialog = false;
         }
     }
 
@@ -76,36 +83,52 @@ public class PacmanDoctor : MonoBehaviour
 
     void ShowDialog()
     {
-        int cost = (PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth) * 2;
+        cost = (PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth) * 2;
 
         if (cost > 0)
         {
             dialogText.text = $"Do you want to heal for {cost}?";
             dialogBox.SetActive(true);
+            isQuestionDialog = true;
         }
         else
         {
             dialogText.text = "You are already at full health!";
             dialogBox.SetActive(true);
+            buttons.SetActive(false);
             Invoke(nameof(HideDialog), 2f);
         }
     }
 
+    void ShowButtons()
+    {
+        dialogBox.SetActive(false);
+        buttons.SetActive(true);
+    }
+
     void OnYesClicked()
     {
-        int cost = (PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth) * 2;
-
-        if (PlayerStats.Instance.currentHealth < PlayerStats.Instance.maxHealth)
+        if (PlayerStats.Instance.coins >= cost)
         {
-            PlayerStats.Instance.currentHealth = PlayerStats.Instance.maxHealth;
+            dialogText.text = $"You are healed for {cost} coins!";
+            dialogBox.SetActive(true);
+            PlayerStats.Instance.Heal(cost);
+            buttons.SetActive(false);
+            Invoke(nameof(HideDialog), 2f);
         }
-
-        dialogBox.SetActive(false);
+        else
+        {
+            buttons.SetActive(false);
+            dialogText.text = "You don't have enough coins!";
+            dialogBox.SetActive(true);
+            Invoke(nameof(HideDialog), 2f);
+        }
     }
 
     void OnNoClicked()
     {
-        dialogBox.SetActive(false);
+        buttons.SetActive(false);
+        HideDialog();
     }
 
     void HideDialog()
