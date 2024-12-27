@@ -15,20 +15,16 @@ public class GhostBehaviour : MonoBehaviour
 
     private Vector3 originalPosition; // To store the original position of Pacman
     private Quaternion originalRotation; // To store the original rotation of Pacman
-    private bool isPacmanRelocating = false; // To prevent multiple simultaneous relocations
+    // private bool isPacmanRelocating = false; // To prevent multiple simultaneous relocations
     public bool isBattle = false; // Bool to check if the battle is active
     private PlayerMovement playerMovement; // Reference to Pacman's movement script (PlayerMovement)
     private Animator pacmanAnimator; // Reference to Pacman's Animator component
     public GameObject battleUIPanel; // Reference to the UI Panel for the battle
-    public Button attackButton;
-    public Button skillButton;
-    public Button guardButton;
-    public Button runButton;
 
 
     private void Start()
     {
-        startPosition = transform.position + new Vector3(-2.0f, 0, 0); 
+        startPosition = transform.position + new Vector3(-2.0f, 0, 0);
         InitializeDirections();
         StartCoroutine(MoveInSquare());
 
@@ -45,109 +41,103 @@ public class GhostBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Pacman"))
-        {
-            if (gameObject.CompareTag("Ghost"))
-            {
-                // Ghost collision: 10 damage, 1 coin, no treasure chest
-                HandleEnemyCollision(other.gameObject);
-            }
-            else if (gameObject.CompareTag("Boss"))
-            {
-                // Boss collision: 50 damage, 100 coins, spawn treasure chest
-                //reminder change damage prolly for this
-                HandleEnemyCollision(other.gameObject);
-            }
-        }
-    }
-
-    void HandleEnemyCollision(GameObject pacman)
-    {
-        if (!isPacmanRelocating)
+        if (other.CompareTag("Pacman") && !isBattle)
         {
             isBattle = true;
 
-            // Set Pacman's state
-            pacmanAnimator = pacman.GetComponent<Animator>();
-            playerMovement = pacman.GetComponent<PlayerMovement>();
+            pacmanAnimator = other.GetComponent<Animator>();
+            playerMovement = other.GetComponent<PlayerMovement>();
 
-            if (battleUIPanel != null && isBattle)
+            BattleController battleController = FindObjectOfType<BattleController>();
+            if (battleController != null)
             {
-                pacmanAnimator.SetBool("isWalking", false);
-                battleUIPanel.SetActive(true); // Show the battle UI panel
-                initializeBattleUI();
+                Vector3 originalPosition = other.transform.position;
+                Quaternion originalRotation = other.transform.rotation;
+
+                playerMovement.enabled = false; // Disable movement
+                pacmanAnimator.SetBool("isWalking", false); // Stop walking animation
+                GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
+                if (ghostBehaviour != null)
+                {
+                    ghostBehaviour.SetMovement(false);
+                }
+
+                // Set up battle state in the BattleController
+                battleController.SetPlayerState(originalPosition, originalRotation, playerMovement);
+                battleController.StartBattle(GetComponent<EnemyStats>());
+                battleUIPanel.SetActive(true);
+                battleController.initializeBattleUI();
+
+                // Relocate Pacman and enemy to battle positions
+                RelocateForBattle(other.gameObject);
             }
-
-            // Handle temporary relocation
-            StartCoroutine(TemporarilyRelocatePacman(pacman));
         }
     }
 
-    void initializeBattleUI()
+    private void RelocateForBattle(GameObject pacman)
     {
-        // Find the buttons in the Battle UI
-        attackButton = battleUIPanel.transform.Find("Attack Button").GetComponent<Button>();
-        skillButton = battleUIPanel.transform.Find("Skill Button").GetComponent<Button>();
-        guardButton = battleUIPanel.transform.Find("Guard Button").GetComponent<Button>();
-        runButton = battleUIPanel.transform.Find("Run Button").GetComponent<Button>();
-
-        Debug.Log("Battle UI initialized and listeners attached.");
-    }
-
-    private IEnumerator TemporarilyRelocatePacman(GameObject pacman)
-    {
-        isPacmanRelocating = true;
-
-        // Store the original position of Pacman
-        originalPosition = pacman.transform.position;
-        originalRotation = pacman.transform.rotation;
-
-
-        // Disable Pacman's movement (if PlayerMovement is attached)
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = false;
-        }
-        else
-        {
-            Debug.LogError("PlayerMovement script not found on Pacman.");
-        }
-
-        // New position to relocate Pacman
-        Vector3 newPosition = new Vector3(15.322f, 27.94f, 4.538f);
-
-        pacman.transform.position = newPosition;
+        pacman.transform.position = new Vector3(15.322f, 27.94f, 4.538f);
         pacman.transform.rotation = Quaternion.Euler(0f, 135f, 0f);
 
-        Vector3 newGhostPosition = new Vector3(18.25f, 28.17f, 1.85f);
-        Quaternion newGhostRotation = Quaternion.Euler(0f, -45f, 0f);
-        gameObject.transform.position = newGhostPosition;
-        gameObject.transform.rotation = newGhostRotation;
-        GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
-        if (ghostBehaviour != null)
-        {
-            ghostBehaviour.SetMovement(false);
-        }
-
-        yield return new WaitForSeconds(5f);
-
-        pacman.transform.position = originalPosition;
-        pacman.transform.rotation = originalRotation;
-
-        // Re-enable Pacman's movement
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = true;
-        }
-
-        isBattle = false;
-        battleUIPanel.SetActive(false);
-        isPacmanRelocating = false;
-        Destroy(gameObject);
-        PlayerStats.Instance.AddCoins(1);
+        transform.position = new Vector3(18.25f, 28.17f, 1.85f);
+        transform.rotation = Quaternion.Euler(0f, -45f, 0f);
     }
 
-        void InitializeDirections()
+
+    // private IEnumerator TemporarilyRelocatePacman(GameObject pacman)
+    // {
+    //     isPacmanRelocating = true;
+
+    //     // Store the original position of Pacman
+    //     originalPosition = pacman.transform.position;
+    //     originalRotation = pacman.transform.rotation;
+
+
+    //     // Disable Pacman's movement (if PlayerMovement is attached)
+    //     if (playerMovement != null)
+    //     {
+    //         playerMovement.enabled = false;
+    //     }
+    //     else
+    //     {
+    //         Debug.LogError("PlayerMovement script not found on Pacman.");
+    //     }
+
+    //     // New position to relocate Pacman
+    //     Vector3 newPosition = new Vector3(15.322f, 27.94f, 4.538f);
+
+    //     pacman.transform.position = newPosition;
+    //     pacman.transform.rotation = Quaternion.Euler(0f, 135f, 0f);
+
+    //     Vector3 newGhostPosition = new Vector3(18.25f, 28.17f, 1.85f);
+    //     Quaternion newGhostRotation = Quaternion.Euler(0f, -45f, 0f);
+    //     gameObject.transform.position = newGhostPosition;
+    //     gameObject.transform.rotation = newGhostRotation;
+    //     GhostBehaviour ghostBehaviour = gameObject.GetComponent<GhostBehaviour>();
+    //     if (ghostBehaviour != null)
+    //     {
+    //         ghostBehaviour.SetMovement(false);
+    //     }
+
+    //     yield return new WaitForSeconds(5f);
+
+    //     pacman.transform.position = originalPosition;
+    //     pacman.transform.rotation = originalRotation;
+
+    //     // Re-enable Pacman's movement
+    //     if (playerMovement != null)
+    //     {
+    //         playerMovement.enabled = true;
+    //     }
+
+    //     isBattle = false;
+    //     battleUIPanel.SetActive(false);
+    //     isPacmanRelocating = false;
+    //     Destroy(gameObject);
+    //     PlayerStats.Instance.AddCoins(1);
+    // }
+
+    void InitializeDirections()
     {
         directions = new Vector3[] {
             new Vector3(2.6f, 0, 0) * edgeLength, // kanan
@@ -174,7 +164,7 @@ public class GhostBehaviour : MonoBehaviour
             {
                 if (!canMove) break;
 
-                Vector3 direction = (nextPosition - transform.position).normalized; 
+                Vector3 direction = (nextPosition - transform.position).normalized;
                 transform.position += direction * speed * Time.deltaTime;
 
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
@@ -185,6 +175,16 @@ public class GhostBehaviour : MonoBehaviour
 
             currentDirectionIndex = (currentDirectionIndex + 1) % directions.Length;
         }
+    }
+
+    public void OnBattleEnd()
+    {
+        // Stop any movement and cleanup logic for the ghost
+        canMove = false;
+        isBattle = false;
+
+        // Optionally relocate or destroy the ghost
+        Destroy(gameObject);
     }
 
     public void SetMovement(bool enable)

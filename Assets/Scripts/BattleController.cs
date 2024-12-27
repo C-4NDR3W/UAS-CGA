@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
 
@@ -9,13 +11,59 @@ public class BattleController : MonoBehaviour
 
     public GameObject treasureChest;
     public BattleState state;
+    public GameObject battleUIPanel;
     private EnemyStats enemyStats;
     private bool isGuarding = false; // Tracks if the player is guarding
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
+    private PlayerMovement playerMovement;
+
+    public Button attackButton;
+    public Button skillButton;
+    public Button guardButton;
+    public Button runButton;
 
     private void Start()
     {
-        
+        if (battleUIPanel == null)
+        {
+            battleUIPanel = InGameUI.Instance.battleUIPanel;
+        }
+
+        if (battleUIPanel != null)
+        {
+            battleUIPanel.SetActive(false);
+        }
     }
+
+    public void initializeBattleUI()
+    {
+        // Find the buttons in the Battle UI
+        attackButton = battleUIPanel.transform.Find("Attack Button").GetComponent<Button>();
+        skillButton = battleUIPanel.transform.Find("Skill Button").GetComponent<Button>();
+        guardButton = battleUIPanel.transform.Find("Guard Button").GetComponent<Button>();
+        runButton = battleUIPanel.transform.Find("Run Button").GetComponent<Button>();
+
+        attackButton.onClick.AddListener(() => Debug.Log("Attack Button clicked in onClick"));
+        attackButton.onClick.AddListener(OnAttackButton);
+        if (attackButton.onClick.GetPersistentEventCount() > 0)
+            Debug.Log("Attack Button listener attached");
+        else
+            Debug.LogError("Attack Button listener not attached");
+        skillButton.onClick.AddListener(OnSkillButton);
+        guardButton.onClick.AddListener(OnGuardButton);
+        runButton.onClick.AddListener(OnRunButton);
+
+        Debug.Log("Battle UI initialized and listeners attached.");
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+            Debug.Log("Mouse Click Detected");
+
+    }
+
 
     public void OnAttackButton()
     {
@@ -121,42 +169,70 @@ public class BattleController : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        // After enemy's turn, switch to the player's turn
-        state = BattleState.PLAYERTURN;
-        Debug.Log("Player's Turn");
-    }
-
-    /*
-    private void endbattle()
-    {
-        if (state == battlestate.win)
+        if (PlayerStats.Instance.currentHealth <= 0)
         {
-            debug.log("player wins!");
-            battleuipanel.setactive(false);
-            destroy(gameobject); // destroy enemy object
-            reward player
-                playerstats.instance.addcoins(1);
+            state = BattleState.LOSE;
+            EndBattle();
         }
-        else if (state == battlestate.lose)
+        else
+        {
+            state = BattleState.PLAYERTURN;
+            Debug.Log("Player's Turn");
+        }
+    }
+    private void EndBattle()
+    {
+        if (state == BattleState.WIN)
+        {
+            Debug.Log("player wins!");
+            PlayerStats.Instance.AddCoins(1);
+        }
+        else if (state == BattleState.LOSE)
         {
             Debug.Log("Player Loses!");
-            battleUIPanel.SetActive(false);
             if (PlayerStats.Instance.currentHealth <= 0)
             {
                 //game over
             }
         }
 
-        isbattle = false;
-        ispacmanrelocating = false;
-
-        return pacman to the original position
-            if (originalposition != vector3.zero)
+        battleUIPanel.SetActive(false);
+        GhostBehaviour ghost = FindObjectOfType<GhostBehaviour>();
+        if (ghost != null)
         {
-            playermovement.enabled = true;
-            playermovement.transform.position = originalposition;
-            playermovement.transform.rotation = originalrotation;
+            ghost.OnBattleEnd();
+        }
+
+        // Reset battle states
+        state = BattleState.START;
+
+        // Relocate Pacman and reset movement
+        ResetPacmanPosition();
+    }
+
+    private void ResetPacmanPosition()
+    {
+        if (originalPosition != Vector3.zero)
+        {
+            playerMovement.enabled = true;
+            playerMovement.transform.position = originalPosition;
+            playerMovement.transform.rotation = originalRotation;
         }
     }
-    */
+
+    public void SetPlayerState(Vector3 position, Quaternion rotation, PlayerMovement movement)
+    {
+        originalPosition = position;
+        originalRotation = rotation;
+        playerMovement = movement;
+    }
+
+    public void StartBattle(EnemyStats enemy)
+    {
+        enemyStats = enemy;
+        state = BattleState.START;
+        battleUIPanel.SetActive(true);
+        state = BattleState.PLAYERTURN;
+        Debug.Log("Battle Started!");
+    }
 }
