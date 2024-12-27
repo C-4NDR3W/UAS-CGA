@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    public void Start()
+    {
+        DestroyAllDontDestroyOnLoadObjects();
+    }
+
     public void PlayGame()
     {
         PlayerPrefs.SetString("GameMode", "Campaign");
@@ -24,5 +29,16 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+
+    public void DestroyAllDontDestroyOnLoadObjects()
+    {
+
+        var go = new GameObject("Sacrificial Lamb");
+        DontDestroyOnLoad(go);
+
+        foreach (var root in go.scene.GetRootGameObjects())
+            Destroy(root);
     }
 }
