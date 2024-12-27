@@ -1916,7 +1916,7 @@ GameObject:
   - component: {fileID: 1294596044}
   - component: {fileID: 1294596043}
   m_Layer: 5
-  m_Name: Guard
+  m_Name: Guard Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

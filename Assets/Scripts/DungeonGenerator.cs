@@ -214,7 +214,7 @@ public class DungeonGenerator : MonoBehaviour
 
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
-        // SpawnGhosts();
+        SpawnGhosts();
         SpawnPacmanDoctor();
     }
 

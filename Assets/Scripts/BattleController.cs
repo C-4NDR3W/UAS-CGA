@@ -93,7 +93,7 @@ public class BattleController : MonoBehaviour
             enemyStats.Initialize(playerLevel);
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
 
         state = BattleState.PLAYERTURN;
         Debug.Log("PLayer turn starts");
@@ -119,6 +119,44 @@ public class BattleController : MonoBehaviour
         // PlayerStats.Instance.AddCoins(1);
     }
 
+    void initializeBattleUI()
+    {
+        // Find the buttons in the Battle UI (Ensure your button objects have the correct tags or names)
+        Button attackButton = GameObject.Find("Attack Button").GetComponent<Button>();
+        Debug.Log(attackButton != null ? "Attack Button found" : "Attack Button not found");
+        Button skillButton = GameObject.Find("Skill Button").GetComponent<Button>();
+        Button guardButton = GameObject.Find("Guard Button").GetComponent<Button>();
+        Button runButton = GameObject.Find("Run Button").GetComponent<Button>();
+
+        // Attach OnClick listeners to the buttons
+        if (attackButton != null)
+        {
+            attackButton.onClick.RemoveAllListeners();
+            attackButton.onClick.AddListener(() => Debug.Log("Attack Button Clicked!"));
+            Debug.Log("Attached listener to Attack Button");
+        }
+
+        if (skillButton != null)
+        {
+            skillButton.onClick.RemoveAllListeners();
+            skillButton.onClick.AddListener(onSkillButton);
+        }
+
+        if (guardButton != null)
+        {
+            guardButton.onClick.RemoveAllListeners();
+            guardButton.onClick.AddListener(onGuardButton);
+        }
+
+        if (runButton != null)
+        {
+            runButton.onClick.RemoveAllListeners();
+            runButton.onClick.AddListener(onRunButton);
+        }
+
+        Debug.Log("Battle UI initialized and listeners attached.");
+    }
+
     void HandleEnemyCollision(GameObject pacman)
     {
         if (!isPacmanRelocating)
@@ -133,6 +171,7 @@ public class BattleController : MonoBehaviour
             {
                 pacmanAnimator.SetBool("isWalking", false);
                 battleUIPanel.SetActive(true); // Show the battle UI panel
+                initializeBattleUI();
             }
 
             // Handle temporary relocation
