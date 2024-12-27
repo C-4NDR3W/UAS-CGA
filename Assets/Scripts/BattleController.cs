@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
@@ -18,6 +17,7 @@ public class BattleController : MonoBehaviour
     private Quaternion originalRotation;
     private PlayerMovement playerMovement;
 
+    public GameObject doctorUIPanel;
     public Button attackButton;
     public Button skillButton;
     public Button guardButton;
@@ -44,26 +44,13 @@ public class BattleController : MonoBehaviour
         guardButton = battleUIPanel.transform.Find("Guard Button").GetComponent<Button>();
         runButton = battleUIPanel.transform.Find("Run Button").GetComponent<Button>();
 
-        attackButton.onClick.AddListener(() => Debug.Log("Attack Button clicked in onClick"));
         attackButton.onClick.AddListener(OnAttackButton);
-        if (attackButton.onClick.GetPersistentEventCount() > 0)
-            Debug.Log("Attack Button listener attached");
-        else
-            Debug.LogError("Attack Button listener not attached");
         skillButton.onClick.AddListener(OnSkillButton);
         guardButton.onClick.AddListener(OnGuardButton);
         runButton.onClick.AddListener(OnRunButton);
 
         Debug.Log("Battle UI initialized and listeners attached.");
     }
-
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-            Debug.Log("Mouse Click Detected");
-
-    }
-
 
     public void OnAttackButton()
     {
@@ -205,6 +192,7 @@ public class BattleController : MonoBehaviour
 
         // Reset battle states
         state = BattleState.START;
+        doctorUIPanel.SetActive(true); // Hides the entire panel
 
         // Relocate Pacman and reset movement
         ResetPacmanPosition();
@@ -231,8 +219,30 @@ public class BattleController : MonoBehaviour
     {
         enemyStats = enemy;
         state = BattleState.START;
+
+        // Make sure the battle UI is active
         battleUIPanel.SetActive(true);
+
+        // Disable the doctor UI (if it’s blocking the button)
+        doctorUIPanel.SetActive(false);
+
+        // Set the state to Player's turn
         state = BattleState.PLAYERTURN;
         Debug.Log("Battle Started!");
+
+        // Initialize the battle UI if necessary
+        initializeBattleUI();
+    }
+
+    public void SetupBattle()
+    {
+        enemyStats = gameObject.GetComponent<EnemyStats>();
+        if (enemyStats != null)
+        {
+            int playerLevel = PlayerStats.Instance.level; // Get player's level
+            enemyStats.Initialize(playerLevel);
+        }
+
+        StartBattle(enemyStats);
     }
 }
