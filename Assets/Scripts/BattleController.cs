@@ -87,7 +87,26 @@ public class BattleController : MonoBehaviour
     }
     IEnumerator PlayerRun()
     {
+        float runChance;
         yield return new WaitForSeconds(1f);
+        if (enemyStats.enemyLevel <= PlayerStats.Instance.level)
+        {
+            runChance = 0.8f;
+        }
+        else
+        {
+            runChance = 0.4f;
+        }
+
+        if (Random.Range(0.0f, 1.0f) < runChance)
+        {
+            state = BattleState.LOSE;
+            EndBattle();
+        }
+        else
+        {
+            state = BattleState.ENEMYTURN;
+        }
     }
 
     IEnumerator EnemyTurn()
