@@ -55,9 +55,17 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, bool guardState)
     {
-        currentHealth -= damage;
+        if (guardState != true)
+        {
+            currentHealth -= damage;
+        }
+        else
+        {
+            currentHealth -= damage / 2;
+        }
+
         healthBar.SetHealth(currentHealth);
     }
 
@@ -72,7 +80,7 @@ public class PlayerStats : MonoBehaviour
     public void AddCoins(float multiplier = 1.0f)
     {
         int amount = Random.Range(1, 11);
-        int totalReward = Mathf.CeilToInt(amount * multiplier); 
+        int totalReward = Mathf.CeilToInt(amount * multiplier);
         coins += totalReward;
         UpdateCoinUI();
     }

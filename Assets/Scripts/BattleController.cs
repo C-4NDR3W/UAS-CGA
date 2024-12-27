@@ -16,6 +16,8 @@ public class BattleController : MonoBehaviour
     public GameObject treasureChest;
     public BattleState state;
     private EnemyStats enemyStats;
+    private bool isGuarding = false; // Tracks if the player is guarding
+
 
 
     private void Start()
@@ -38,13 +40,13 @@ public class BattleController : MonoBehaviour
             if (gameObject.CompareTag("Ghost"))
             {
                 // Ghost collision: 10 damage, 1 coin, no treasure chest
-                HandleEnemyCollision(other.gameObject, damage: 2);
+                HandleEnemyCollision(other.gameObject);
             }
             else if (gameObject.CompareTag("Boss"))
             {
                 // Boss collision: 50 damage, 100 coins, spawn treasure chest
                 //reminder change damage prolly for this
-                HandleEnemyCollision(other.gameObject, damage: 50);
+                HandleEnemyCollision(other.gameObject);
                 RelocateTreasureChest();
             }
         }
@@ -94,6 +96,7 @@ public class BattleController : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         state = BattleState.PLAYERTURN;
+        Debug.Log("PLayer turn starts");
 
 
         // // Check if the original position is valid and return Pacman to it
@@ -116,7 +119,7 @@ public class BattleController : MonoBehaviour
         // PlayerStats.Instance.AddCoins(1);
     }
 
-    void HandleEnemyCollision(GameObject pacman, int damage)
+    void HandleEnemyCollision(GameObject pacman)
     {
         if (!isPacmanRelocating)
         {
@@ -131,9 +134,6 @@ public class BattleController : MonoBehaviour
                 pacmanAnimator.SetBool("isWalking", false);
                 battleUIPanel.SetActive(true); // Show the battle UI panel
             }
-
-            // Apply damage and reward
-            PlayerStats.Instance.TakeDamage(damage);
 
             // Handle temporary relocation
             StartCoroutine(TemporarilyRelocatePacman(pacman));
@@ -151,8 +151,10 @@ public class BattleController : MonoBehaviour
 
     public void onAttackButton()
     {
+        Debug.Log("Player Attack Button");
         if (state != BattleState.PLAYERTURN)
         {
+            Debug.Log("Cannot attack, wrong state: " + state);
             return;
         }
         StartCoroutine(PlayerAttack());
@@ -161,35 +163,112 @@ public class BattleController : MonoBehaviour
 
     IEnumerator PlayerAttack()
     {
+        if (enemyStats != null)
+        {
+            enemyStats.TakeDamage(PlayerStats.Instance.attackPower);
+        }
         yield return new WaitForSeconds(1f);
+
+        if (enemyStats != null && enemyStats.isDead())
+        {
+            state = BattleState.WIN;
+            EndBattle();
+        }
+        else
+        {
+            StartCoroutine(EnemyTurn());
+        }
     }
 
     public void onGuardButton()
     {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        StartCoroutine(PlayerGuard());
 
     }
 
     IEnumerator PlayerGuard()
     {
-        yield return new WaitForSeconds(2f);
+        isGuarding = true;
+        yield return new WaitForSeconds(1f);
+
+        state = BattleState.ENEMYTURN;
+        StartCoroutine(EnemyTurn());
     }
 
     public void onSkillButton()
     {
-
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        StartCoroutine(PlayerSkill());
     }
 
     IEnumerator PlayerSkill()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
     }
     public void onRunButton()
     {
-
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        StartCoroutine(PlayerRun());
     }
     IEnumerator PlayerRun()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
     }
+
+    IEnumerator EnemyTurn()
+    {
+        state = BattleState.ENEMYTURN;
+
+        yield return new WaitForSeconds(1f);
+
+
+        PlayerStats.Instance.TakeDamage(enemyStats.attackPower, isGuarding);
+        isGuarding = false;
+
+        yield return new WaitForSeconds(1f);
+
+        // After enemy's turn, switch to the player's turn
+        state = BattleState.PLAYERTURN;
+        Debug.Log("Player's Turn");
+    }
+
+    private void EndBattle()
+    {
+        if (state == BattleState.WIN)
+        {
+            Debug.Log("Player Wins!");
+            battleUIPanel.SetActive(false);
+            Destroy(gameObject); // Destroy enemy object
+                                 // Reward player
+            PlayerStats.Instance.AddCoins(1);
+        }
+        else if (state == BattleState.LOSE)
+        {
+            Debug.Log("Player Loses!");
+            // Handle game over logic here
+        }
+
+        isBattle = false;
+        isPacmanRelocating = false;
+
+        // Return Pacman to the original position
+        if (originalPosition != Vector3.zero)
+        {
+            playerMovement.enabled = true;
+            playerMovement.transform.position = originalPosition;
+            playerMovement.transform.rotation = originalRotation;
+        }
+    }
+
 
 }

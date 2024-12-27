@@ -3,7 +3,9 @@ guid: 0c690ebff962c1241b16381795d57726
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - battleUIPanel: {instanceID: 0}
+  - treasureChest: {fileID: 919132149155446097, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

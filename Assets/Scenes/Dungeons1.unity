@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731713, g: 0.13414736, b: 0.12107852, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1874,7 +1874,7 @@ MonoBehaviour:
   - {fileID: 6987189982405831671, guid: 88f4b10394921d242905ce34ad9f5808, type: 3}
   - {fileID: 2546857237411795272, guid: c904c15c27f58f8498c71a985d95b67b, type: 3}
   numberOfGhosts: 4
-  size: {x: 5, y: 4}
+  size: {x: 4, y: 3}
   startPos: 0
   rooms:
   - room: {fileID: 8909528592693746965, guid: 49876348096b98740979389dd33720dc, type: 3}

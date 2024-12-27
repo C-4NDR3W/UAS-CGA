@@ -29,5 +29,10 @@ public class EnemyStats : MonoBehaviour
 
     }
 
+    public bool isDead()
+    {
+        return currentHp <= 0;
+    }
+
 
 }
