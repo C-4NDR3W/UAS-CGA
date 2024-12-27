@@ -139,9 +139,13 @@ public class BattleController : MonoBehaviour
         }
         else if (state == battlestate.lose)
         {
-            debug.log("player loses!");
-            handle game over logic here
+            Debug.Log("Player Loses!");
+            battleUIPanel.SetActive(false);
+            if (PlayerStats.Instance.currentHealth <= 0)
+            {
+                //game over
             }
+        }
 
         isbattle = false;
         ispacmanrelocating = false;
