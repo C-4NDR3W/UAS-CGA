@@ -12,27 +12,17 @@ public class LevelController : MonoBehaviour
             string gameMode = PlayerPrefs.GetString("GameMode", "Campaign");
 
             int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            Debug.Log(gameMode);
-            Debug.Log(currentSceneIndex);
 
             if (gameMode == "Campaign")
             {
-                if (currentSceneIndex == 4) 
+                if (currentSceneIndex == 4)
                 {
-                    GameObject[] dontDestroyObjects = GameObject.FindObjectsOfType<GameObject>();
-
-                    foreach (GameObject obj in dontDestroyObjects)
-                    {
-                        if (obj.scene.buildIndex == -1)
-                        {
-                            Destroy(obj);
-                        }
-                    }
                     SceneManager.LoadScene(0);
+                    DestroyDontDestroyOnLoadObjects();
                 }
                 else
                 {
-                    SceneManager.LoadScene(currentSceneIndex + 1); 
+                    SceneManager.LoadScene(currentSceneIndex + 1);
                 }
             }
             else if (gameMode == "Endless")
@@ -43,10 +33,34 @@ public class LevelController : MonoBehaviour
                 }
                 else
                 {
-                    SceneManager.LoadScene(currentSceneIndex + 1); 
+                    SceneManager.LoadScene(currentSceneIndex + 1);
                 }
             }
         }
     }
-}
 
+    IEnumerator DestroyDontDestroyOnLoadObjects()
+    {
+        yield return null;
+
+        // Find the objects you want to remove or destroy
+        GameObject pacman = GameObject.Find("Pacman(Clone)");
+        GameObject inGameUI = GameObject.Find("In Game UI");
+
+        // Check if the objects are found
+        if (pacman != null)
+        {
+            // Move Pacman to the current scene to remove it from DontDestroyOnLoad
+            SceneManager.MoveGameObjectToScene(pacman, SceneManager.GetActiveScene());
+            Destroy(pacman); // Destroy it after moving to the active scene
+        }
+
+        if (inGameUI != null)
+        {
+            // Move In Game UI to the current scene to remove it from DontDestroyOnLoad
+            SceneManager.MoveGameObjectToScene(inGameUI, SceneManager.GetActiveScene());
+            Destroy(inGameUI); // Destroy it after moving to the active scene
+        }
+    }
+
+}

@@ -21,10 +21,38 @@ public class PlayerStats : MonoBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject); // Tetap ada di semua scene
+        InitializeUI();
 
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
         UpdateCoinUI();
+    }
+
+    public void InitializeUI()
+    {
+        GameObject normalUI = GameObject.Find("In Game UI/NormalUI");
+
+        if (normalUI != null)
+        {
+            // Find the HealthBar and CoinText components
+            HealthBar foundHealthBar = normalUI.GetComponentInChildren<HealthBar>();
+            TMP_Text foundCoinText = normalUI.GetComponentInChildren<TMP_Text>();
+
+            // Assign the found UI elements to PlayerStats
+            if (foundHealthBar != null && foundCoinText != null)
+            {
+                healthBar = foundHealthBar;
+                coinText = foundCoinText;
+            }
+            else
+            {
+                Debug.LogError("HealthBar or CoinText not found in NormalUI.");
+            }
+        }
+        else
+        {
+            Debug.LogError("NormalUI not found in InGameUI.");
+        }
     }
 
     public void TakeDamage(int damage)

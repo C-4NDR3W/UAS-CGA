@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
@@ -212,7 +213,7 @@ public class DungeonGenerator : MonoBehaviour
 
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
-        SpawnGhosts();
+        //SpawnGhosts();
         SpawnPacmanDoctor();
     }
 

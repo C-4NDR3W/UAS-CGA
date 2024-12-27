@@ -8,6 +8,7 @@ public class BossFloor : MonoBehaviour
 
     void Start()
     {
+
         GameObject existingPacman = GameObject.FindGameObjectWithTag("Pacman");
 
         if (existingPacman != null)
