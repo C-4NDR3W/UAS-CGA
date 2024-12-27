@@ -18,7 +18,8 @@ public class DungeonGenerator : MonoBehaviour
 
     private List<Cell> board;
 
-    public bool isBattleScene = false; 
+    public bool isBattleScene = false;
+    Vector3 pacmanSpawnPosition;
 
     public class Cell
     {
@@ -213,7 +214,7 @@ public class DungeonGenerator : MonoBehaviour
 
         PlaceStairsRoom();
         SpawnOrRelocatePacman();
-        //SpawnGhosts();
+        // SpawnGhosts();
         SpawnPacmanDoctor();
     }
 
@@ -266,15 +267,15 @@ public class DungeonGenerator : MonoBehaviour
     void SpawnOrRelocatePacman()
     {
         GameObject existingPacman = GameObject.FindGameObjectWithTag("Pacman");
-        Vector3 spawnPosition = GetSpawnPosition();
+        Vector3 pacmanSpawnPosition = GetSpawnPosition();
 
         if (existingPacman != null)
         {
-            existingPacman.transform.position = spawnPosition;
+            existingPacman.transform.position = pacmanSpawnPosition;
         }
         else
         {
-            GameObject newPacman = Instantiate(pacmanPrefab, spawnPosition, Quaternion.identity);
+            GameObject newPacman = Instantiate(pacmanPrefab, pacmanSpawnPosition, Quaternion.identity);
             newPacman.tag = "Pacman";
         }
     }
@@ -297,44 +298,53 @@ public class DungeonGenerator : MonoBehaviour
 
     void SpawnGhosts()
     {
-            List<Vector3> spawnPositions = new List<Vector3>();
+        List<Vector3> spawnPositions = new List<Vector3>();
 
-            for (int i = 0; i < size.x; i++)
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
             {
-                for (int j = 0; j < size.y; j++)
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
                 {
-                    Cell currentCell = board[(i + j * size.x)];
-                    if (currentCell.visited)
-                    {
-                        spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
-                    }
+                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
                 }
             }
+        }
 
-            for (int k = 0; k < numberOfGhosts; k++)
+        for (int k = 0; k < numberOfGhosts; k++)
+        {
+            if (spawnPositions.Count == 0) break;
+
+            int randomIndex = Random.Range(0, spawnPositions.Count);
+            Vector3 spawnPosition = spawnPositions[randomIndex];
+
+            if (spawnPosition == pacmanSpawnPosition)
             {
-                if (spawnPositions.Count == 0) break;
-
-                int randomIndex = Random.Range(0, spawnPositions.Count);
-                Vector3 spawnPosition = spawnPositions[randomIndex];
+                // Skip this spawn position if it's the same as Pacman's
                 spawnPositions.RemoveAt(randomIndex);
+                k--; // Decrement k to retry spawning this ghost
+                continue;
+            }
 
-                if (ghostPrefabs.Length > 0)
+            spawnPositions.RemoveAt(randomIndex);
+
+            if (ghostPrefabs.Length > 0)
+            {
+                int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
+                GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
+
+                GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
+                if (ghostBehaviour != null)
                 {
-                    int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
-                    GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
-
-                    GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
-                    if (ghostBehaviour != null)
+                    if (isBattleScene)
                     {
-                        if (isBattleScene)
-                        {
-                            ghostBehaviour.enabled = false;
-                        }
+                        ghostBehaviour.enabled = false;
                     }
                 }
             }
         }
+    }
 
     void SpawnPacmanDoctor()
     {
