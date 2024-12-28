@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5411287265690493859}
   - component: {fileID: 2936735160527342504}
   - component: {fileID: 2863383280252511747}
+  - component: {fileID: -1415297859526540863}
   m_Layer: 0
   m_Name: Ghost (2)
   m_TagString: Ghost
@@ -90,8 +91,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c690ebff962c1241b16381795d57726, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isBattle: 0
+  treasureChest: {fileID: 0}
+  state: 0
   battleUIPanel: {fileID: 0}
+  doctorUIPanel: {fileID: 0}
+  attackButton: {fileID: 0}
+  skillButton: {fileID: 0}
+  guardButton: {fileID: 0}
+  runButton: {fileID: 0}
 --- !u!136 &2936735160527342504
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -129,6 +136,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   edgeLength: 3
+  isBattle: 0
+  battleUIPanel: {fileID: 0}
+--- !u!114 &-1415297859526540863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2546857237411795272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c748d77d068ad40813a075ea3361b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyLevel: 0
+  maxHp: 0
+  currentHp: 0
+  attackPower: 0
+  defenseModifier: 0
+  xpReward: 0
 --- !u!1001 &2572427003554101706
 PrefabInstance:
   m_ObjectHideFlags: 0

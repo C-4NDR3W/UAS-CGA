@@ -28,6 +28,7 @@ public class BattleController : MonoBehaviour
         if (battleUIPanel == null)
         {
             battleUIPanel = InGameUI.Instance.battleUIPanel;
+            doctorUIPanel = InGameUI.Instance.doctorUIPanel;
         }
 
         if (battleUIPanel != null)
@@ -60,6 +61,8 @@ public class BattleController : MonoBehaviour
             Debug.Log("Cannot attack, wrong state: " + state);
             return;
         }
+        StartCoroutine(PlayerAttack());
+        Debug.Log("Player Attacked! " + state);
     }
 
     IEnumerator PlayerAttack()
@@ -73,10 +76,12 @@ public class BattleController : MonoBehaviour
         if (enemyStats != null && enemyStats.isDead())
         {
             state = BattleState.WIN;
+            EndBattle();
         }
         else
         {
             StartCoroutine(EnemyTurn());
+            Debug.Log("Transferring to Enemy Turn: " + state);
         }
     }
 
@@ -151,6 +156,23 @@ public class BattleController : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
 
+        // Attempt to deal damage to the player
+        PlayerStats.Instance.TakeDamage(enemyStats.attackPower, isGuarding);
+        isGuarding = false;
+
+        yield return new WaitForSeconds(1f);
+
+        if (PlayerStats.Instance.currentHealth <= 0)
+        {
+            state = BattleState.LOSE;
+            EndBattle();
+        }
+        else
+        {
+            state = BattleState.PLAYERTURN;
+            Debug.Log("Player's Turn");
+        }
+
         PlayerStats.Instance.TakeDamage(enemyStats.attackPower, isGuarding);
         isGuarding = false;
 
@@ -192,7 +214,7 @@ public class BattleController : MonoBehaviour
 
         // Reset battle states
         state = BattleState.START;
-        doctorUIPanel.SetActive(true); // Hides the entire panel
+        doctorUIPanel.SetActive(true);
 
         // Relocate Pacman and reset movement
         ResetPacmanPosition();
@@ -215,23 +237,31 @@ public class BattleController : MonoBehaviour
         playerMovement = movement;
     }
 
-    public void StartBattle(EnemyStats enemy)
+    private bool isCoroutineRunning = false;
+
+    public IEnumerator StartBattle(EnemyStats enemy)
     {
+        if (isCoroutineRunning)
+        {
+            Debug.LogWarning("StartBattle coroutine already running!");
+            yield break;
+        }
+
+        isCoroutineRunning = true;
         enemyStats = enemy;
         state = BattleState.START;
 
-        // Make sure the battle UI is active
         battleUIPanel.SetActive(true);
-
-        // Disable the doctor UI (if it’s blocking the button)
         doctorUIPanel.SetActive(false);
 
-        // Set the state to Player's turn
-        state = BattleState.PLAYERTURN;
-        Debug.Log("Battle Started!");
+        yield return new WaitForEndOfFrame();
 
-        // Initialize the battle UI if necessary
+        state = BattleState.PLAYERTURN;
+        Debug.Log("Player Turn Starts");
+        Debug.Log("State changed to: " + state);
+
         initializeBattleUI();
+        isCoroutineRunning = false;
     }
 
     public void SetupBattle()
@@ -243,6 +273,6 @@ public class BattleController : MonoBehaviour
             enemyStats.Initialize(playerLevel);
         }
 
-        StartBattle(enemyStats);
+        StartCoroutine(StartBattle(enemyStats));
     }
 }
