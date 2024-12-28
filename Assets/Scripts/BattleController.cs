@@ -196,12 +196,16 @@ public class BattleController : MonoBehaviour
             Debug.Log("player wins!");
             PlayerStats.Instance.AddCoins(1);
         }
-        else if (state == BattleState.LOSE)
+        else if (state == BattleState.LOSE) //TODO GAME OVER
         {
             Debug.Log("Player Loses!");
             if (PlayerStats.Instance.currentHealth <= 0)
             {
                 //game over
+                //game over UI
+                //Retry or Main Menu
+                //retry mybe
+                // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
 
@@ -237,17 +241,8 @@ public class BattleController : MonoBehaviour
         playerMovement = movement;
     }
 
-    private bool isCoroutineRunning = false;
-
     public IEnumerator StartBattle(EnemyStats enemy)
     {
-        if (isCoroutineRunning)
-        {
-            Debug.LogWarning("StartBattle coroutine already running!");
-            yield break;
-        }
-
-        isCoroutineRunning = true;
         enemyStats = enemy;
         state = BattleState.START;
 
@@ -261,7 +256,6 @@ public class BattleController : MonoBehaviour
         Debug.Log("State changed to: " + state);
 
         initializeBattleUI();
-        isCoroutineRunning = false;
     }
 
     public void SetupBattle()

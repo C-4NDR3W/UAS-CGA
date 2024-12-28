@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
 
 public class PlayerStats : MonoBehaviour
@@ -13,6 +14,8 @@ public class PlayerStats : MonoBehaviour
     public int level = 1;
     public int xpPoints;
     public int xpToNextLevel;
+    public List<Skill> skills = new List<Skill>();
+    private int maxSkills = 3;
 
     public HealthBar healthBar;
     public TMP_Text coinText;
@@ -26,6 +29,50 @@ public class PlayerStats : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
         UpdateCoinUI();
+
+        InitializeStartingSkill();
+    }
+
+    private void InitializeStartingSkill()
+    {
+        SkillManager skillManager = FindObjectOfType<SkillManager>();
+        Skill startingSkill = skillManager.GenerateSkill(skillManager.GetRandomSkillName(), 1);
+        skills.Add(startingSkill);
+        Debug.Log($"Starting skill added: {startingSkill.name} (Tier {startingSkill.tier})");
+    }
+
+    public void RewardSkillAfterBattle()
+    {
+        SkillManager skillManager = FindObjectOfType<SkillManager>();
+        int currentTier = Mathf.FloorToInt(level / 5f) + 1;
+
+        // Generate a random skill from the available options
+        Skill newSkill = skillManager.GenerateSkill(skillManager.GetRandomSkillName(), currentTier);
+        Debug.Log($"Reward skill: {newSkill.name} (Tier {newSkill.tier})");
+
+        // If the player has less than 3 skills, add the new skill
+        if (skills.Count < maxSkills)
+        {
+            skills.Add(newSkill);
+            Debug.Log($"Skill added: {newSkill.name} (Tier {newSkill.tier})");
+        }
+        else
+        {
+            // Player already has 3 skills, replace one
+            ForgetAndReplaceSkill(newSkill);
+        }
+    }
+
+    private void ForgetAndReplaceSkill(Skill newSkill) //TODO
+    {
+        Debug.Log("Player has 3 skills. Replacing a skill...");
+
+        // Present a choice to the player (you can implement a UI popup for selection).
+        // For now, we replace a random skill.
+        int skillToReplaceIndex = Random.Range(0, skills.Count);
+        Debug.Log($"Replacing skill: {skills[skillToReplaceIndex].name} with {newSkill.name}");
+
+        skills[skillToReplaceIndex] = newSkill;
     }
 
     public void InitializeUI()
@@ -112,4 +159,6 @@ public class PlayerStats : MonoBehaviour
         attackPower += 5; // Increase attack power
         currentHealth = maxHealth; // Fully heal the player
     }
+
+    
 }

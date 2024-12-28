@@ -214,6 +214,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5994637470393376623}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6295126087014463211}
   m_SourcePrefab: {fileID: 100100000, guid: 657656f76a5a97b459f7be58cfd5abc2, type: 3}
 --- !u!4 &8155774591396196127 stripped
 Transform:
@@ -326,8 +329,20 @@ MonoBehaviour:
   currentHealth: 0
   attackPower: 10
   coins: 0
-  atkDmg: 10
-  speed: 1
   level: 1
+  xpPoints: 0
+  xpToNextLevel: 0
   healthBar: {fileID: 0}
   coinText: {fileID: 0}
+--- !u!114 &6295126087014463211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8819439412277671333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31c5783db3b1e1348aee319664d1930a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
