@@ -25,6 +25,7 @@ public class BattleController : MonoBehaviour
     public Button runButton;
     public TMP_Text skillButtonText;
 
+    public InGameAudio inGameAudio;
     private void Start()
     {
         if (battleUIPanel == null)
@@ -37,6 +38,8 @@ public class BattleController : MonoBehaviour
         {
             battleUIPanel.SetActive(false);
         }
+
+        inGameAudio = FindObjectOfType<InGameAudio>();
     }
 
     public void initializeBattleUI()
@@ -63,6 +66,7 @@ public class BattleController : MonoBehaviour
             Debug.Log("Cannot attack, wrong state: " + state);
             return;
         }
+        inGameAudio.PlayClickSound();
         StartCoroutine(PlayerAttack());
         Debug.Log("Player Attacked! " + state);
     }
@@ -93,8 +97,8 @@ public class BattleController : MonoBehaviour
         {
             return;
         }
+        inGameAudio.PlayClickSound();
         StartCoroutine(PlayerGuard());
-
     }
 
     IEnumerator PlayerGuard()
@@ -112,6 +116,7 @@ public class BattleController : MonoBehaviour
         {
             return;
         }
+        inGameAudio.PlayClickSound();
         StartCoroutine(PlayerSkill());
     }
 
@@ -125,6 +130,7 @@ public class BattleController : MonoBehaviour
         {
             return;
         }
+        inGameAudio.PlayClickSound();
         StartCoroutine(PlayerRun());
     }
     IEnumerator PlayerRun()
