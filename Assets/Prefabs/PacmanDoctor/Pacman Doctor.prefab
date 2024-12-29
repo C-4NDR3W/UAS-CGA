@@ -302,7 +302,7 @@ GameObject:
   - component: {fileID: 2408617955594685170}
   m_Layer: 0
   m_Name: Pacman Doctor
-  m_TagString: Untagged
+  m_TagString: PacmanDoctor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

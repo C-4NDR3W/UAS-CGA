@@ -8,6 +8,8 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject pacmanPrefab;
     public GameObject pacmanDoctorPrefab;
     public GameObject[] ghostPrefabs; // Array untuk semua prefab ghost
+    public GameObject treasureChestPrefab;
+
     public int numberOfGhosts = 4;
 
     public Vector2Int size;
@@ -216,6 +218,7 @@ public class DungeonGenerator : MonoBehaviour
         SpawnOrRelocatePacman();
         SpawnGhosts();
         SpawnPacmanDoctor();
+        SpawnTreasureChests();
     }
 
     void PlaceStairsRoom()
@@ -370,4 +373,73 @@ public class DungeonGenerator : MonoBehaviour
             GameObject pacamanDoctor = Instantiate(pacmanDoctorPrefab, spawnPosition, Quaternion.identity);
         }
     }
+
+    void SpawnTreasureChests()
+    {
+        int minimumChests = 2;
+        // Create a list of spawnable positions
+        List<Vector3> spawnPositions = new List<Vector3>();
+
+        // Populate the list with visited cells
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    spawnPositions.Add(new Vector3(i * offset.x, 0.5f, -j * offset.y));
+                }
+            }
+        }
+
+        // Remove occupied positions (Pacman and Pacman Doctor positions)
+        HashSet<Vector3> occupiedPositions = new HashSet<Vector3>();
+
+        // Add Pacman's position
+        GameObject pacman = GameObject.FindGameObjectWithTag("Pacman");
+        if (pacman != null)
+        {
+            occupiedPositions.Add(pacman.transform.position);
+        }
+
+        // Add Pacman Doctor's position
+        GameObject pacmanDoctor = GameObject.FindGameObjectWithTag("PacmanDoctor");
+        if (pacmanDoctor != null)
+        {
+            occupiedPositions.Add(pacmanDoctor.transform.position);
+        }
+
+        // Remove all occupied positions from the spawnable positions list
+        spawnPositions.RemoveAll(pos => occupiedPositions.Contains(pos));
+
+        // Ensure there are valid positions available
+        if (spawnPositions.Count < minimumChests)
+        {
+            Debug.LogError($"Not enough valid positions to spawn {minimumChests} treasure chests!");
+            return;
+        }
+
+        // Shuffle the spawn positions for randomness
+        Shuffle(spawnPositions);
+
+        // Spawn the required number of treasure chests
+        for (int i = 0; i < minimumChests; i++)
+        {
+            Instantiate(treasureChestPrefab, spawnPositions[i], Quaternion.identity);
+        }
+    }
+
+    // Utility function to shuffle a list
+    void Shuffle<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
+        }
+    }
+
 }

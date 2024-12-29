@@ -730,10 +730,16 @@ MonoBehaviour:
   state: 0
   battleUIPanel: {fileID: 1117563892}
   doctorUIPanel: {fileID: 1199136151}
+  dialogBox: {fileID: 0}
+  dialogText: {fileID: 0}
   attackButton: {fileID: 1545564306}
   skillButton: {fileID: 957808569}
+  skillText: {fileID: 0}
   guardButton: {fileID: 1294596043}
   runButton: {fileID: 1865050702}
+  playerButton: {fileID: 0}
+  enemyHealth: {fileID: 0}
+  turn: {fileID: 0}
   skillButtonText: {fileID: 0}
   inGameAudio: {fileID: 0}
 --- !u!4 &566225784
@@ -1980,6 +1986,7 @@ MonoBehaviour:
   - {fileID: 8795188415640614061, guid: da7dce71e8c32a94baa2a5c04e5cf81e, type: 3}
   - {fileID: 6987189982405831671, guid: 88f4b10394921d242905ce34ad9f5808, type: 3}
   - {fileID: 2546857237411795272, guid: c904c15c27f58f8498c71a985d95b67b, type: 3}
+  treasureChestPrefab: {fileID: 6254735099397954883, guid: a3405f5615a0a9a498dfc2b8c7a4f222, type: 3}
   numberOfGhosts: 4
   size: {x: 5, y: 4}
   startPos: 0

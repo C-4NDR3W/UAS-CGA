@@ -1,10 +1,18 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
+
+public enum UIPanelState
+{
+    Default,
+    Skills
+}
+
 
 public class BattleController : MonoBehaviour
 {
@@ -29,10 +37,11 @@ public class BattleController : MonoBehaviour
     public Button playerButton;
     public TMP_Text enemyHealth;
     public TMP_Text turn;
-    
+
     public TMP_Text skillButtonText;
 
     public InGameAudio inGameAudio;
+    private UIPanelState currentUIPanelState = UIPanelState.Default;
     private void Start()
     {
         if (battleUIPanel == null)
@@ -67,10 +76,7 @@ public class BattleController : MonoBehaviour
         skillButton = battleUIPanel.transform.Find("Buttons/Skill Button").GetComponent<Button>();
         guardButton = battleUIPanel.transform.Find("Buttons/Guard Button").GetComponent<Button>();
         runButton = battleUIPanel.transform.Find("Buttons/Run Button").GetComponent<Button>();
-
-        skillText = skillButton.transform.Find("Skill Text").GetComponent<TMP_Text>();
-        skillText.text = PlayerStats.Instance.skills[0].name;
-
+        
         attackButton.onClick.AddListener(OnAttackButton);
         skillButton.onClick.AddListener(OnSkillButton);
         guardButton.onClick.AddListener(OnGuardButton);
@@ -157,31 +163,85 @@ public class BattleController : MonoBehaviour
 
     public void OnSkillButton()
     {
-        if (state != BattleState.PLAYERTURN)
+        if (currentUIPanelState == UIPanelState.Default)
         {
-            return;
+            OpenSkillPanel();
+            inGameAudio.PlayClickSound();
         }
-        inGameAudio.PlayClickSound();
-        StartCoroutine(PlayerSkill());
+        else
+        {
+            OpenDefaultPanel();
+        }
     }
 
-    IEnumerator PlayerSkill()
-    {   
-        if (dialogText != null)
+    private void OpenSkillPanel()
+    {
+        // Switch to the skill panel
+        currentUIPanelState = UIPanelState.Skills;
+
+        List<Skill> skills = PlayerStats.Instance.skills;
+
+        attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name : "Skill 1";
+        skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name : "Skill 2";
+        guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name : "Skill 3";
+        runButton.GetComponentInChildren<TMP_Text>().text = "Back";
+
+        attackButton.onClick.RemoveAllListeners();
+        skillButton.onClick.RemoveAllListeners();
+        guardButton.onClick.RemoveAllListeners();
+        runButton.onClick.RemoveAllListeners();
+
+        attackButton.onClick.AddListener(() => UseSkill(0));
+        skillButton.onClick.AddListener(() => UseSkill(1));
+        guardButton.onClick.AddListener(() => UseSkill(2));
+        runButton.onClick.AddListener(OpenDefaultPanel);
+    }
+
+    private void OpenDefaultPanel()
+    {
+        // Switch back to the default panel
+        currentUIPanelState = UIPanelState.Default;
+
+        attackButton.GetComponentInChildren<TMP_Text>().text = "Attack";
+        skillButton.GetComponentInChildren<TMP_Text>().text = "Skill";
+        guardButton.GetComponentInChildren<TMP_Text>().text = "Guard";
+        runButton.GetComponentInChildren<TMP_Text>().text = "Run";
+
+        attackButton.onClick.RemoveAllListeners();
+        skillButton.onClick.RemoveAllListeners();
+        guardButton.onClick.RemoveAllListeners();
+        runButton.onClick.RemoveAllListeners();
+
+        attackButton.onClick.AddListener(OnAttackButton);
+        skillButton.onClick.AddListener(OnSkillButton);
+        guardButton.onClick.AddListener(OnGuardButton);
+        runButton.onClick.AddListener(OnRunButton);
+    }
+    private void UseSkill(int skillIndex)
+    {
+        List<Skill> skills = PlayerStats.Instance.skills;
+        if (skillIndex < skills.Count)
         {
-            dialogBox.SetActive(true);
-            dialogText.text = "Player uses a skill!";
+            Skill selectedSkill = skills[skillIndex];
+            StartCoroutine(PlayerUseSkill(selectedSkill));
         }
+    }
+
+    IEnumerator PlayerUseSkill(Skill skill) //UNFINISHED
+    {
+        dialogBox.SetActive(true);
+        dialogText.text = $"Player uses {skill.name}!";
+
+        // Perform skill effect (example: damage enemy)
         yield return new WaitForSeconds(1.5f);
 
-        if (dialogBox != null)
-        {
-            dialogBox.SetActive(false);
-        }
+        dialogBox.SetActive(false);
 
-        UpdateUI();
+        // Go back to the default panel
+        OpenDefaultPanel();
     }
-    
+
+
     public void OnRunButton()
     {
         if (state != BattleState.PLAYERTURN)
@@ -236,29 +296,24 @@ public class BattleController : MonoBehaviour
 
         /// Determine the enemy's action based on conditions
         float missingHpPercentage = (float)(enemyStats.maxHp - enemyStats.currentHp) / enemyStats.maxHp;
-        bool shouldHeal = missingHpPercentage >= 0.15f && enemyStats.currentHp < enemyStats.maxHp;
-        bool shouldReallyHeal = missingHpPercentage >= 0.6f && enemyStats.currentHp < enemyStats.maxHp;
+        float healChance = 0f;
+
+        if (missingHpPercentage >= 0.7f) // 70% missing HP
+        {
+            healChance = 0.3f; // Higher chance to heal
+        }
+        else if (missingHpPercentage >= 0.15f) // 15% missing HP
+        {
+            healChance = 0.1f; // Lower chance to heal
+        }
         bool playerIsGuarding = isGuarding;
 
         // Adjust guard break chance
         float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
 
         // Randomly decide the action
-        float actionRoll = Random.value; // Returns a value between 0 and 1
-        if (shouldHeal && actionRoll < 0.1f)
-        {
-            enemyStats.HealEnemy();
-            dialogBox.SetActive(true);
-            dialogText.text = "Enemy healed itself!";
-            
-            yield return new WaitForSeconds(1.5f);
-            
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
-        }
-        else if (shouldReallyHeal && actionRoll < 0.33f)
+        float actionRoll = Random.value;
+        if (actionRoll < healChance)
         {
             enemyStats.HealEnemy();
             dialogBox.SetActive(true);
@@ -353,6 +408,19 @@ public class BattleController : MonoBehaviour
 
         // Relocate Pacman and reset movement
         ResetPacmanPosition();
+
+        // Reset enemy stats
+        if (enemyStats != null)
+        {
+            enemyStats = null;
+        }
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+            dialogText.text = string.Empty;
+        }
+
     }
 
     private void ResetPacmanPosition()

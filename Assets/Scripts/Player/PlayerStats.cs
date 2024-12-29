@@ -9,7 +9,7 @@ public class PlayerStats : MonoBehaviour
     // Stats Pacman
     public int maxHealth = 100;
     public int currentHealth;
-    public int attackPower = 10;
+    public int attackPower = 15;
     public int coins = 0;
     public int level = 1;
     public int xpPoints;
