@@ -43,24 +43,24 @@ public class BattleController : MonoBehaviour
             battleUIPanel.SetActive(false);
         }
 
-        dialogBox = battleUIPanel.transform.Find("Player Button")?.gameObject;
+        dialogBox = battleUIPanel.transform.Find("Player TextBox")?.gameObject;
         dialogText = dialogBox.transform.Find("Player Text")?.GetComponent<TMP_Text>();
 
         if (dialogBox != null)
         {
             dialogBox.SetActive(false);
         }
-        
+
         inGameAudio = FindObjectOfType<InGameAudio>();
     }
 
     public void initializeBattleUI()
     {
         // Find the buttons in the Battle UI
-        attackButton = battleUIPanel.transform.Find("Attack Button").GetComponent<Button>();
-        skillButton = battleUIPanel.transform.Find("Skill Button").GetComponent<Button>();
-        guardButton = battleUIPanel.transform.Find("Guard Button").GetComponent<Button>();
-        runButton = battleUIPanel.transform.Find("Run Button").GetComponent<Button>();
+        attackButton = battleUIPanel.transform.Find("Buttons/Attack Button").GetComponent<Button>();
+        skillButton = battleUIPanel.transform.Find("Buttons/Skill Button").GetComponent<Button>();
+        guardButton = battleUIPanel.transform.Find("Buttons/Guard Button").GetComponent<Button>();
+        runButton = battleUIPanel.transform.Find("Buttons/Run Button").GetComponent<Button>();
 
         attackButton.onClick.AddListener(OnAttackButton);
         skillButton.onClick.AddListener(OnSkillButton);
@@ -94,7 +94,7 @@ public class BattleController : MonoBehaviour
                 dialogText.text = "Player attacks the enemy!";
             }
         }
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
         if (dialogBox != null)
         {
@@ -131,7 +131,7 @@ public class BattleController : MonoBehaviour
             dialogBox.SetActive(true);
             dialogText.text = "Player is guarding!";
         }
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
         if (dialogBox != null)
         {
@@ -159,7 +159,7 @@ public class BattleController : MonoBehaviour
             dialogBox.SetActive(true);
             dialogText.text = "Player uses a skill!";
         }
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
         if (dialogBox != null)
         {
@@ -184,7 +184,7 @@ public class BattleController : MonoBehaviour
             dialogText.text = "Player attempts to run!";
         }
         float runChance;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
         if (dialogBox != null)
         {
             dialogBox.SetActive(false);
@@ -230,23 +230,55 @@ public class BattleController : MonoBehaviour
         if (shouldHeal && actionRoll < 0.1f)
         {
             enemyStats.HealEnemy();
-            Debug.Log("Enemy healed itself!");
+            dialogBox.SetActive(true);
+            dialogText.text = "Enemy healed itself!";
+            
+            yield return new WaitForSeconds(1.5f);
+            
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
         }
         else if (shouldReallyHeal && actionRoll < 0.33f)
         {
             enemyStats.HealEnemy();
-            Debug.Log("Enemy healed itself!");
+            dialogBox.SetActive(true);
+            dialogText.text = "Enemy healed itself!";
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
         }
         else if (actionRoll < guardBreakChance) // Guard break with a dynamic low chance
         {
             int damage = enemyStats.GuardBreak(isGuarding);
             PlayerStats.Instance.TakeDamage(damage, false);
-            Debug.Log("Enemy used Guard Break!");
+            dialogBox.SetActive(true);
+            dialogText.text = "Enemy used Guard Break!";
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
         }
         else // Default action is attack
         {
             PlayerStats.Instance.TakeDamage(enemyStats.attackPower, playerIsGuarding);
-            Debug.Log("Enemy attacked!");
+            dialogBox.SetActive(true);
+            dialogText.text = "Enemy attacked!";
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
         }
 
         yield return new WaitForSeconds(1f);
