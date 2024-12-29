@@ -23,6 +23,7 @@ public class BattleController : MonoBehaviour
     public TMP_Text dialogText;
     public Button attackButton;
     public Button skillButton;
+    public TMP_Text skillText;
     public Button guardButton;
     public Button runButton;
     public Button playerButton;
@@ -66,6 +67,9 @@ public class BattleController : MonoBehaviour
         skillButton = battleUIPanel.transform.Find("Buttons/Skill Button").GetComponent<Button>();
         guardButton = battleUIPanel.transform.Find("Buttons/Guard Button").GetComponent<Button>();
         runButton = battleUIPanel.transform.Find("Buttons/Run Button").GetComponent<Button>();
+
+        skillText = skillButton.transform.Find("Skill Text").GetComponent<TMP_Text>();
+        skillText.text = PlayerStats.Instance.skills[0].name;
 
         attackButton.onClick.AddListener(OnAttackButton);
         skillButton.onClick.AddListener(OnSkillButton);

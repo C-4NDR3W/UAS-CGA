@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 89296222}
   - component: {fileID: 89296221}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Skill Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3654,6 +3654,7 @@ MonoBehaviour:
   dialogText: {fileID: 0}
   attackButton: {fileID: 780669030}
   skillButton: {fileID: 957808569}
+  skillText: {fileID: 0}
   guardButton: {fileID: 1294596043}
   runButton: {fileID: 1865050702}
   playerButton: {fileID: 0}
