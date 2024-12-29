@@ -164,12 +164,42 @@ public class BattleController : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
 
-        // Attempt to deal damage to the player
-        PlayerStats.Instance.TakeDamage(enemyStats.attackPower, isGuarding);
-        isGuarding = false;
+        /// Determine the enemy's action based on conditions
+        float missingHpPercentage = (float)(enemyStats.maxHp - enemyStats.currentHp) / enemyStats.maxHp;
+        bool shouldHeal = missingHpPercentage >= 0.15f && enemyStats.currentHp < enemyStats.maxHp;
+        bool shouldReallyHeal = missingHpPercentage >= 0.6f && enemyStats.currentHp < enemyStats.maxHp;
+        bool playerIsGuarding = isGuarding;
+
+        // Adjust guard break chance
+        float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
+
+        // Randomly decide the action
+        float actionRoll = Random.value; // Returns a value between 0 and 1
+        if (shouldHeal && actionRoll < 0.1f)
+        {
+            enemyStats.HealEnemy();
+            Debug.Log("Enemy healed itself!");
+        }
+        else if (shouldReallyHeal && actionRoll < 0.33f)
+        {
+            enemyStats.HealEnemy();
+            Debug.Log("Enemy healed itself!");
+        }
+        else if (actionRoll < guardBreakChance) // Guard break with a dynamic low chance
+        {
+            int damage = enemyStats.GuardBreak(isGuarding);
+            PlayerStats.Instance.TakeDamage(damage, false);
+            Debug.Log("Enemy used Guard Break!");
+        }
+        else // Default action is attack
+        {
+            PlayerStats.Instance.TakeDamage(enemyStats.attackPower, playerIsGuarding);
+            Debug.Log("Enemy attacked!");
+        }
 
         yield return new WaitForSeconds(1f);
 
+        // Check if the player is defeated
         if (PlayerStats.Instance.currentHealth <= 0)
         {
             state = BattleState.LOSE;
@@ -181,21 +211,7 @@ public class BattleController : MonoBehaviour
             Debug.Log("Player's Turn");
         }
 
-        PlayerStats.Instance.TakeDamage(enemyStats.attackPower, isGuarding);
         isGuarding = false;
-
-        yield return new WaitForSeconds(1f);
-
-        if (PlayerStats.Instance.currentHealth <= 0)
-        {
-            state = BattleState.LOSE;
-            EndBattle();
-        }
-        else
-        {
-            state = BattleState.PLAYERTURN;
-            Debug.Log("Player's Turn");
-        }
     }
     private void EndBattle()
     {

@@ -23,15 +23,43 @@ public class EnemyStats : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        int takenDamage = Mathf.Max(damage - defenseModifier, 1);
+        int defenseValue = defenseModifier + Random.Range(0, 1 * enemyLevel);
+        int takenDamage = Mathf.Max(damage - defenseValue, 1);
         currentHp -= takenDamage;
         currentHp = Mathf.Clamp(currentHp, 0, maxHp);
 
     }
 
+    public void TakeIntimidateDamage(int damage)
+    {
+        int takenDamage = Mathf.Max(damage, 1);
+        currentHp -= takenDamage;
+        currentHp = Mathf.Clamp(currentHp, 0, maxHp);
+    }
+
     public bool isDead()
     {
         return currentHp <= 0;
+    }
+
+    public void HealEnemy()
+    {
+        currentHp += Random.Range(maxHp / 4, maxHp);
+        currentHp = Mathf.Clamp(currentHp, 0, maxHp); // Clamp between 0 and maxHp
+    }
+
+    public int GuardBreak(bool isGuarding)
+    {
+        if (isGuarding == true)
+        {
+            int takenDamage = 2 * attackPower;
+            return takenDamage;
+        }
+        else
+        {
+            int takenDamage = attackPower / 2;
+            return takenDamage;
+        }
     }
 
 

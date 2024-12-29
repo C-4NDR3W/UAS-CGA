@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class SkillManager : MonoBehaviour
 {
-    private List<string> skillNames = new List<string> { "Heal", "Pound", "Haste", "Intimidate" };
+    private List<string> skillNames = new List<string> { "Heal", "Pound", "Haste", "Intimidate", "Inverse" };
 
     // Generate a skill based on type and tier
     public Skill GenerateSkill(string skillType, int tier)
     {
         int basePower = skillType == "Heal" || skillType == "Pound" ? 20 * tier : 0;
-        int cooldown = skillType == "Haste" ? 5 - tier : 3; // Example cooldown adjustment by tier
+        int cooldown = 3;
         return new Skill(skillType, tier, basePower, cooldown, skillType);
     }
 

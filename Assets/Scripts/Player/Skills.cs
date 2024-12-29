@@ -48,13 +48,15 @@ public class Skill
                 break;
 
             case "Haste":
-                Debug.Log($"Player is hastened (Tier {tier}). Implement haste effects here.");
+                Debug.Log($"Player is hastened (Tier {tier}). All Skill Cooldowns are Reduced.");
                 break;
 
             case "Intimidate":
-                Debug.Log($"Enemy attack power reduced temporarily (Tier {tier}). Implement debuff effects.");
+                Debug.Log($"Enemy Defenses Lowered.");
                 break;
-
+            case "Inverse":
+                Debug.Log("Inverse is Used. All attacks and healing effects are reversed.");
+                break;
             default:
                 Debug.LogError("Unknown skill used.");
                 break;
