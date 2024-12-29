@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
@@ -18,11 +19,14 @@ public class BattleController : MonoBehaviour
     private PlayerMovement playerMovement;
 
     public GameObject doctorUIPanel;
+    public GameObject dialogBox;
+    public TMP_Text dialogText;
     public Button attackButton;
     public Button skillButton;
     public Button guardButton;
     public Button runButton;
-
+    public Button playerButton;
+    
     public InGameAudio inGameAudio;
     private void Start()
     {
@@ -37,6 +41,14 @@ public class BattleController : MonoBehaviour
             battleUIPanel.SetActive(false);
         }
 
+        dialogBox = battleUIPanel.transform.Find("Player Button")?.gameObject;
+        dialogText = dialogBox.transform.Find("Player Text")?.GetComponent<TMP_Text>();
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
+        
         inGameAudio = FindObjectOfType<InGameAudio>();
     }
 
@@ -74,8 +86,18 @@ public class BattleController : MonoBehaviour
         if (enemyStats != null)
         {
             enemyStats.TakeDamage(PlayerStats.Instance.attackPower);
+            if (dialogText != null)
+            {
+                dialogBox.SetActive(true);
+                dialogText.text = "Player attacks the enemy!";
+            }
         }
         yield return new WaitForSeconds(1f);
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
 
         if (enemyStats != null && enemyStats.isDead())
         {
@@ -102,7 +124,17 @@ public class BattleController : MonoBehaviour
     IEnumerator PlayerGuard()
     {
         isGuarding = true;
+        if (dialogText != null)
+        {
+            dialogBox.SetActive(true);
+            dialogText.text = "Player is guarding!";
+        }
         yield return new WaitForSeconds(1f);
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
 
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
@@ -119,9 +151,20 @@ public class BattleController : MonoBehaviour
     }
 
     IEnumerator PlayerSkill()
-    {
+    {   
+        if (dialogText != null)
+        {
+            dialogBox.SetActive(true);
+            dialogText.text = "Player uses a skill!";
+        }
         yield return new WaitForSeconds(1f);
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
     }
+    
     public void OnRunButton()
     {
         if (state != BattleState.PLAYERTURN)
@@ -133,8 +176,17 @@ public class BattleController : MonoBehaviour
     }
     IEnumerator PlayerRun()
     {
+        if (dialogText != null)
+        {
+            dialogBox.SetActive(true);
+            dialogText.text = "Player attempts to run!";
+        }
         float runChance;
         yield return new WaitForSeconds(1f);
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
         if (enemyStats.enemyLevel <= PlayerStats.Instance.level)
         {
             runChance = 0.8f;
