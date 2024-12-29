@@ -26,6 +26,8 @@ public class BattleController : MonoBehaviour
     public Button guardButton;
     public Button runButton;
     public Button playerButton;
+    public TMP_Text enemyHealth;
+    public TMP_Text turn;
     
     public TMP_Text skillButtonText;
 
@@ -43,18 +45,21 @@ public class BattleController : MonoBehaviour
             battleUIPanel.SetActive(false);
         }
 
-        dialogBox = battleUIPanel.transform.Find("Player TextBox")?.gameObject;
-        dialogText = dialogBox.transform.Find("Player Text")?.GetComponent<TMP_Text>();
+        dialogBox = battleUIPanel.transform.Find("Player TextBox").gameObject;
+        dialogText = dialogBox.transform.Find("Player Text").GetComponent<TMP_Text>();
 
         if (dialogBox != null)
         {
             dialogBox.SetActive(false);
         }
 
+        enemyHealth = battleUIPanel.transform.Find("Enemy Health").GetComponent<TMP_Text>();
+        turn = battleUIPanel.transform.Find("Turn").GetComponent<TMP_Text>();
+
         inGameAudio = FindObjectOfType<InGameAudio>();
     }
 
-    public void initializeBattleUI()
+    public void InitializeBattleUI()
     {
         // Find the buttons in the Battle UI
         attackButton = battleUIPanel.transform.Find("Buttons/Attack Button").GetComponent<Button>();
@@ -101,10 +106,12 @@ public class BattleController : MonoBehaviour
             dialogBox.SetActive(false);
         }
 
+        UpdateUI();
+
         if (enemyStats != null && enemyStats.isDead())
         {
             state = BattleState.WIN;
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
@@ -138,6 +145,8 @@ public class BattleController : MonoBehaviour
             dialogBox.SetActive(false);
         }
 
+        UpdateUI();
+
         state = BattleState.ENEMYTURN;
         StartCoroutine(EnemyTurn());
     }
@@ -165,6 +174,8 @@ public class BattleController : MonoBehaviour
         {
             dialogBox.SetActive(false);
         }
+
+        UpdateUI();
     }
     
     public void OnRunButton()
@@ -201,17 +212,20 @@ public class BattleController : MonoBehaviour
         if (Random.Range(0.0f, 1.0f) < runChance)
         {
             state = BattleState.LOSE;
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
             state = BattleState.ENEMYTURN;
         }
+
+        UpdateUI();
     }
 
     IEnumerator EnemyTurn()
     {
         state = BattleState.ENEMYTURN;
+        UpdateUI();
 
         yield return new WaitForSeconds(1f);
 
@@ -287,7 +301,7 @@ public class BattleController : MonoBehaviour
         if (PlayerStats.Instance.currentHealth <= 0)
         {
             state = BattleState.LOSE;
-            EndBattle();
+            StartCoroutine(EndBattle());
         }
         else
         {
@@ -295,12 +309,17 @@ public class BattleController : MonoBehaviour
             Debug.Log("Player's Turn");
         }
 
+        UpdateUI();
         isGuarding = false;
     }
-    private void EndBattle()
+    private IEnumerator EndBattle()
     {
         if (state == BattleState.WIN)
         {
+            dialogBox.SetActive(true);
+            dialogText.text = "Pacman Wins!";
+            yield return new WaitForSeconds(1f); // Wait for 1 second
+
             Debug.Log("player wins!");
             PlayerStats.Instance.AddCoins(1);
         }
@@ -363,7 +382,8 @@ public class BattleController : MonoBehaviour
         Debug.Log("Player Turn Starts");
         Debug.Log("State changed to: " + state);
 
-        initializeBattleUI();
+        InitializeBattleUI();
+        UpdateUI();
     }
 
     public void SetupBattle()
@@ -376,5 +396,28 @@ public class BattleController : MonoBehaviour
         }
 
         StartCoroutine(StartBattle(enemyStats));
+    }
+
+    private void UpdateUI()
+    {
+        // Update turn text
+        switch (state)
+        {
+            case BattleState.PLAYERTURN:
+                turn.text = "Player";
+                break;
+            case BattleState.ENEMYTURN:
+                turn.text = "Enemy";
+                break;
+            default:
+                turn.text = "Battle Start";
+                break;
+        }
+
+        // Update enemy health text
+        if (enemyStats != null)
+        {
+            enemyHealth.text = $" {enemyStats.currentHp}/{enemyStats.maxHp} ";
+        }
     }
 }
