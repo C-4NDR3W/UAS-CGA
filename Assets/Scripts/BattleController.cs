@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
@@ -22,6 +23,7 @@ public class BattleController : MonoBehaviour
     public Button skillButton;
     public Button guardButton;
     public Button runButton;
+    public TMP_Text skillButtonText;
 
     private void Start()
     {
