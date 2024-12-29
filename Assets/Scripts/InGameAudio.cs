@@ -20,7 +20,7 @@ public class InGameAudio : MonoBehaviour
     private AudioClip clickSound;
 
     public float musicVolume = 0.3f;
-    public float soundVolume = 0.3f;
+    public float soundVolume = 0.15f;
 
     private void Awake()
     {

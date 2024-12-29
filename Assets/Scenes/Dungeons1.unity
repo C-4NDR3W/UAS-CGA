@@ -438,10 +438,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   music: {fileID: 1348822649}
+  background: {fileID: 0}
   click: {fileID: 664152643}
-  clickSound: {fileID: 0}
+  clickSound: {fileID: 8300000, guid: 227da139977ab7d4dbf0cfb874f228bc, type: 3}
   musicVolume: 0.3
-  soundVolume: 0.3
+  soundVolume: 0.15
 --- !u!1 &135660693
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,6 +606,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 124558423}
+        m_TargetAssemblyTypeName: InGameAudio, Assembly-CSharp
+        m_MethodName: PlayClickSound
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -924,7 +937,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 393062745}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 124558423}
+        m_TargetAssemblyTypeName: InGameAudio, Assembly-CSharp
+        m_MethodName: PlayClickSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &393062745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1649,7 +1674,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 836542967}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 124558423}
+        m_TargetAssemblyTypeName: InGameAudio, Assembly-CSharp
+        m_MethodName: PlayClickSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &836542967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3403,10 +3440,11 @@ MonoBehaviour:
   state: 0
   battleUIPanel: {fileID: 1117563892}
   doctorUIPanel: {fileID: 1199136151}
-  attackButton: {fileID: 0}
-  skillButton: {fileID: 0}
-  guardButton: {fileID: 0}
-  runButton: {fileID: 0}
+  attackButton: {fileID: 780669030}
+  skillButton: {fileID: 957808569}
+  guardButton: {fileID: 1294596043}
+  runButton: {fileID: 1865050702}
+  audioManager: {fileID: 0}
 --- !u!4 &1351031172
 Transform:
   m_ObjectHideFlags: 0
@@ -3508,6 +3546,18 @@ MonoBehaviour:
       - m_Target: {fileID: 937206053}
         m_TargetAssemblyTypeName: InGameUI, Assembly-CSharp
         m_MethodName: OnMainMenuButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 124558423}
+        m_TargetAssemblyTypeName: InGameAudio, Assembly-CSharp
+        m_MethodName: PlayClickSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4041,7 +4091,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1901521661}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 124558423}
+        m_TargetAssemblyTypeName: InGameAudio, Assembly-CSharp
+        m_MethodName: PlayClickSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1901521661
 MonoBehaviour:
   m_ObjectHideFlags: 0
