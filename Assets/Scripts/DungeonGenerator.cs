@@ -388,7 +388,7 @@ public class DungeonGenerator : MonoBehaviour
                 Cell currentCell = board[(i + j * size.x)];
                 if (currentCell.visited)
                 {
-                    spawnPositions.Add(new Vector3(i * offset.x, 0.5f, -j * offset.y));
+                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
                 }
             }
         }

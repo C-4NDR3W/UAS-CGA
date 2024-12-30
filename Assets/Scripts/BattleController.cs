@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using UnityEngine.SceneManagement;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
 
@@ -16,6 +16,7 @@ public enum UIPanelState
 
 public class BattleController : MonoBehaviour
 {
+    //public static BattleController Instance;
 
     public GameObject treasureChest;
     public BattleState state;
@@ -31,23 +32,26 @@ public class BattleController : MonoBehaviour
     public TMP_Text dialogText;
     public Button attackButton;
     public Button skillButton;
-    public TMP_Text skillText;
     public Button guardButton;
     public Button runButton;
     public Button playerButton;
     public TMP_Text enemyHealth;
     public TMP_Text turn;
 
+    public GameObject gameOverUIPanel;
+
     public TMP_Text skillButtonText;
 
     public InGameAudio inGameAudio;
     private UIPanelState currentUIPanelState = UIPanelState.Default;
+
     private void Start()
     {
         if (battleUIPanel == null)
         {
             battleUIPanel = InGameUI.Instance.battleUIPanel;
             doctorUIPanel = InGameUI.Instance.doctorUIPanel;
+            gameOverUIPanel = InGameUI.Instance.gameOverUIPanel;
         }
 
         if (battleUIPanel != null)
@@ -65,6 +69,8 @@ public class BattleController : MonoBehaviour
 
         enemyHealth = battleUIPanel.transform.Find("Enemy Health").GetComponent<TMP_Text>();
         turn = battleUIPanel.transform.Find("Turn").GetComponent<TMP_Text>();
+
+
 
         inGameAudio = FindObjectOfType<InGameAudio>();
     }
@@ -387,11 +393,7 @@ public class BattleController : MonoBehaviour
             Debug.Log("Player Loses!");
             if (PlayerStats.Instance.currentHealth <= 0)
             {
-                //game over
-                //game over UI
-                //Retry or Main Menu
-                //retry mybe
-                // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                gameOverUIPanel.SetActive(true);
             }
         }
 

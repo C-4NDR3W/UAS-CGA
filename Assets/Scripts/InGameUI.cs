@@ -10,6 +10,7 @@ public class InGameUI : MonoBehaviour
     public GameObject menuUIPanel;
     public GameObject battleUIPanel;
     public GameObject doctorUIPanel;
+    public GameObject gameOverUIPanel;
 
     void Awake()
     {
@@ -33,7 +34,28 @@ public class InGameUI : MonoBehaviour
     }
     public void OnMainMenuButtonPressed()
     {
-        Debug.Log("Main Menu");
-        SceneManager.LoadScene(0);
+        StartCoroutine(LoadSceneAsync(0));
+    }
+
+    public void OnRetryButtonPressed()
+    {
+        StartCoroutine(LoadSceneAsync(1));
+    }
+
+    IEnumerator LoadSceneAsync(int sceneIndex)
+    {
+        DestroyAllDontDestroyOnLoadObjects();
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+        yield return 1.5f;
+    }
+
+    public void DestroyAllDontDestroyOnLoadObjects()
+    {
+
+        var go = new GameObject("Sacrificial Lamb");
+        DontDestroyOnLoad(go);
+
+        foreach (var root in go.scene.GetRootGameObjects())
+            Destroy(root);
     }
 }
