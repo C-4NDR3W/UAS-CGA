@@ -64,9 +64,8 @@ public class GhostBehaviour : MonoBehaviour
 
                 // Set up battle state in the BattleController
                 battleController.SetPlayerState(originalPosition, originalRotation, playerMovement);
-                battleController.StartBattle(GetComponent<EnemyStats>());
                 battleUIPanel.SetActive(true);
-                battleController.SetupBattle();
+                battleController.SetupBattle(this);
 
                 // Relocate Pacman and enemy to battle positions
                 RelocateForBattle(other.gameObject);
@@ -183,7 +182,6 @@ public class GhostBehaviour : MonoBehaviour
         canMove = false;
         isBattle = false;
 
-        // Optionally relocate or destroy the ghost
         Destroy(gameObject);
     }
 

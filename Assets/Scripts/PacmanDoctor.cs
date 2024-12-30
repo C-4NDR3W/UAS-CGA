@@ -83,7 +83,7 @@ public class PacmanDoctor : MonoBehaviour
 
     void ShowDialog()
     {
-        cost = (PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth) * 2;
+        cost = Mathf.RoundToInt((PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth) * 1.25f);
 
         if (cost > 0)
         {

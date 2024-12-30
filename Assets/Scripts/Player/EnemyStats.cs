@@ -47,6 +47,10 @@ public class EnemyStats : MonoBehaviour
         return currentHp <= 0;
     }
 
+    public int HealAmount(){
+        return Random.Range(maxHp / 4, maxHp / 2);
+    }
+
     public void HealEnemy()
     {
         currentHp += Random.Range(maxHp / 4, maxHp / 2);

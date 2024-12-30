@@ -33,6 +33,32 @@ public class PlayerStats : MonoBehaviour
         InitializeStartingSkill();
     }
 
+    public void UseSkill(Skill skill, EnemyStats target = null)
+    {
+        if (skill == null)
+        {
+            Debug.LogError("Skill is null!");
+            return;
+        }
+
+        if (skill.currentCooldown > 0)
+        {
+            Debug.Log($"Skill {skill.name} is still on cooldown for {skill.currentCooldown} turns!");
+            return;
+        }
+
+        // Use the skill and set its cooldown
+        skill.UseSkill(this, target);
+    }
+
+    public void ReduceCooldowns()
+    {
+        foreach (Skill skill in skills)
+        {
+            skill.ReduceCooldown();
+        }
+    }
+
     private void InitializeStartingSkill()
     {
         SkillManager skillManager = FindObjectOfType<SkillManager>();
@@ -160,5 +186,5 @@ public class PlayerStats : MonoBehaviour
         currentHealth = maxHealth; // Fully heal the player
     }
 
-    
+
 }

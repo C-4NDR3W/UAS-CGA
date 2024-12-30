@@ -48,9 +48,13 @@ public class Skill
                 break;
 
             case "Haste":
-                Debug.Log($"Player is hastened (Tier {tier}). All Skill Cooldowns are Reduced.");
+                int reductionAmount = tier;
+                foreach (Skill playerSkill in player.skills)
+                {
+                    playerSkill.currentCooldown = Mathf.Clamp(playerSkill.currentCooldown - reductionAmount, 1, 3);
+                }
+                Debug.Log($"Player is hastened (Tier {tier}). All skill cooldowns reduced.");
                 break;
-
             case "Intimidate":
                 Debug.Log($"Enemy Defenses Lowered.");
                 break;
