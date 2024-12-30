@@ -12,8 +12,8 @@ public class PlayerStats : MonoBehaviour
     public int attackPower = 15;
     public int coins = 0;
     public int level = 1;
-    public int xpPoints;
-    public int xpToNextLevel;
+    public int xpPoints = 0;
+    public int xpToNextLevel = 25;
     public List<Skill> skills = new List<Skill>();
     private int maxSkills = 3;
 
@@ -154,7 +154,7 @@ public class PlayerStats : MonoBehaviour
     {
         level++;
         xpPoints -= xpToNextLevel;
-        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.2f); // Scale XP needed
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.25f); // Scale XP needed
         maxHealth += 20; // Increase HP on level up
         attackPower += 5; // Increase attack power
         currentHealth = maxHealth; // Fully heal the player

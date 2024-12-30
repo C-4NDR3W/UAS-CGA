@@ -387,6 +387,8 @@ public class BattleController : MonoBehaviour
 
             Debug.Log("player wins!");
             PlayerStats.Instance.AddCoins(1);
+            PlayerStats.Instance.AddExperience(enemyStats.getXP());
+            PlayerStats.Instance.RewardSkillAfterBattle();
         }
         else if (state == BattleState.LOSE) //TODO GAME OVER
         {

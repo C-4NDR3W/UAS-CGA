@@ -21,6 +21,11 @@ public class EnemyStats : MonoBehaviour
         xpReward = 15 + (Random.Range(0, playerLevel) * 3);
     }
 
+    public int getXP()
+    {
+        return xpReward;
+    }
+
     public void TakeDamage(int damage)
     {
         int defenseValue = defenseModifier + Random.Range(0, 1 * enemyLevel);
