@@ -13,7 +13,7 @@ public class EnemyStats : MonoBehaviour
 
     public void Initialize(int playerLevel)
     {
-        enemyLevel = Mathf.Max(1, playerLevel) + Random.Range(-2, 1);
+        enemyLevel = Mathf.Max(1, playerLevel + Random.Range(-2, 1));
         maxHp = 15 + (10 * enemyLevel) + Random.Range(0, 5);
         currentHp = maxHp;
         attackPower = 5 + (2 * enemyLevel) + Random.Range(0, 5);
@@ -47,7 +47,8 @@ public class EnemyStats : MonoBehaviour
         return currentHp <= 0;
     }
 
-    public int HealAmount(){
+    public int HealAmount()
+    {
         return Random.Range(maxHp / 4, maxHp / 2);
     }
 

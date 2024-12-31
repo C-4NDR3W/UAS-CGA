@@ -70,8 +70,9 @@ public class TreasureReward : MonoBehaviour
             dialogText.text = $"You got Coins!";
         }
 
-        Destroy(gameObject);
+        //skill issue, just trigger this multiple times before destroy glhf
         Invoke(nameof(HideDialog), 1f);
+        Destroy(gameObject, 1.1f);
     }
 
     void HideDialog()

@@ -78,6 +78,7 @@ public class BattleController : MonoBehaviour
 
     public void InitializeBattleUI()
     {
+        currentUIPanelState = UIPanelState.Default;
         // Find the buttons in the Battle UI
         attackButton = battleUIPanel.transform.Find("Buttons/Attack Button").GetComponent<Button>();
         skillButton = battleUIPanel.transform.Find("Buttons/Skill Button").GetComponent<Button>();
@@ -189,40 +190,39 @@ public class BattleController : MonoBehaviour
     private void OpenSkillPanel(bool selectNewSkill = false)
     {
         currentUIPanelState = UIPanelState.Skills;
-
         List<Skill> skills = PlayerStats.Instance.skills;
+
+        // Dynamically setup button text and listeners
+        SetupButton(attackButton, skills, 0, selectNewSkill);
+        SetupButton(skillButton, skills, 1, selectNewSkill);
+        SetupButton(guardButton, skills, 2, selectNewSkill);
         if (selectNewSkill)
         {
-            attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name + skills[0].tier : "Skill 1";
-            skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name + skills[1].tier : "Skill 2";
-            guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name + skills[2].tier : "Skill 3";
-            runButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 3 ? skills[3].name + skills[3].tier : "Back";
+            SetupButton(runButton, skills, 3, selectNewSkill);
+        }
+        SetupButton(runButton, skills, 3, selectNewSkill, isBackButton: true);
+    }
 
-            attackButton.onClick.RemoveAllListeners();
-            skillButton.onClick.RemoveAllListeners();
-            guardButton.onClick.RemoveAllListeners();
-            runButton.onClick.RemoveAllListeners();
-
-            attackButton.onClick.AddListener(() => ForgetSkill(0));
-            skillButton.onClick.AddListener(() => ForgetSkill(1));
-            guardButton.onClick.AddListener(() => ForgetSkill(2));
-            runButton.onClick.AddListener(() => ForgetSkill(3));
+    private void SetupButton(Button button, List<Skill> skills, int index, bool selectNewSkill, bool isBackButton = false)
+    {
+        TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+        if (isBackButton)
+        {
+            buttonText.text = "Back";
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(OpenDefaultPanel);
+            return;
         }
 
-        attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name + skills[0].tier : "Skill 1";
-        skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name + skills[1].tier : "Skill 2";
-        guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name + skills[2].tier : "Skill 3";
-        runButton.GetComponentInChildren<TMP_Text>().text = "Back";
+        // Update button text based on available skills
+        buttonText.text = index < skills.Count ? skills[index].name + " Tier " + skills[index].tier : $"Skill {index + 1}";
+        button.onClick.RemoveAllListeners();
 
-        attackButton.onClick.RemoveAllListeners();
-        skillButton.onClick.RemoveAllListeners();
-        guardButton.onClick.RemoveAllListeners();
-        runButton.onClick.RemoveAllListeners();
-
-        attackButton.onClick.AddListener(() => UseSkill(0));
-        skillButton.onClick.AddListener(() => UseSkill(1));
-        guardButton.onClick.AddListener(() => UseSkill(2));
-        runButton.onClick.AddListener(OpenDefaultPanel);
+        // Assign listener based on mode
+        if (selectNewSkill && index < skills.Count)
+            button.onClick.AddListener(() => ForgetSkill(index));
+        else if (index < skills.Count)
+            button.onClick.AddListener(() => UseSkill(index));
     }
 
     private void ForgetSkill(int skillIndex)
@@ -231,14 +231,52 @@ public class BattleController : MonoBehaviour
         if (skillIndex < skills.Count)
         {
             Skill selectedSkill = skills[skillIndex];
-            StartCoroutine(PlayerForgetSKill(selectedSkill));
+            StartCoroutine(PlayerForgetSkill(selectedSkill, skills[3]));
         }
     }
-    IEnumerator PlayerForgetSKill(Skill skill)
-    {
-        yield return new WaitForSeconds(1f);
 
+    private IEnumerator PlayerForgetSkill(Skill oldSkill, Skill newSkill)
+    {
+        yield return new WaitForSeconds(1f); // Optional delay
+
+        // Reference the skills list
+        List<Skill> skills = PlayerStats.Instance.skills;
+
+        // Find the index of the old skill
+        int skillIndex = skills.IndexOf(oldSkill);
+
+        if (skillIndex >= 0)
+        {
+            if (skillIndex == 3)
+            {
+                // If the skill to forget is at index 3, remove it entirely
+                skills.RemoveAt(3);
+            }
+            else
+            {
+                // Otherwise, overwrite the old skill with the new skill
+                skills[skillIndex] = newSkill;
+
+                // Remove the old skill at index 3 after replacing
+                if (skills.Count > 3)
+                {
+                    skills.RemoveAt(3); // ensure skills[3] doesnt exist
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Skill to forget not found in the list.");
+        }
+
+        // Refresh the skill panel after the change
+        OpenSkillPanel(true);
+
+        isSelectingNewSkill = false;
     }
+
+
+
     private void OpenDefaultPanel()
     {
         // Switch back to the default panel
@@ -499,7 +537,7 @@ public class BattleController : MonoBehaviour
             yield return new WaitForSeconds(1f); // Wait for 1 second
 
             Debug.Log("player wins!");
-            PlayerStats.Instance.AddCoins(1);
+            PlayerStats.Instance.AddCoins(enemyStats.enemyLevel);
             PlayerStats.Instance.AddExperience(enemyStats.getXP());
             if (PlayerStats.Instance.skills.Count < 3)
             {
@@ -507,10 +545,17 @@ public class BattleController : MonoBehaviour
             }
             else
             {
+                PlayerStats.Instance.RewardSkillAfterBattle();
                 isSelectingNewSkill = true;
-                dialogText.text = "You cannot hold more than 3 skills, please select one to forget.";
-                yield return new WaitForSeconds(1f);
+                List<Skill> skills = PlayerStats.Instance.skills;
+                dialogText.text = $"You cannot hold more than 3 skills, please select one to forget. You will obtain {skills[3].name} Tier {skills[3].tier}";
+                yield return new WaitForSeconds(3f);
+                dialogBox.SetActive(false);
                 OpenSkillPanel(isSelectingNewSkill);
+                while (isSelectingNewSkill)
+                {
+                    yield return null; // Wait for the next frame
+                }
             }
         }
         else if (state == BattleState.LOSE)
@@ -581,6 +626,13 @@ public class BattleController : MonoBehaviour
         battleUIPanel.SetActive(true);
         doctorUIPanel.SetActive(false);
 
+        // Reset UI components
+        dialogBox.SetActive(false);
+        dialogText.text = string.Empty;
+
+        // Delay to ensure UI updates are visible
+        yield return new WaitForEndOfFrame();
+
         yield return new WaitForEndOfFrame();
 
         state = BattleState.PLAYERTURN;
@@ -590,21 +642,24 @@ public class BattleController : MonoBehaviour
         this.currentGhost = ghost;
 
         InitializeBattleUI();
+        OpenDefaultPanel(); // Ensure default panel is displayed
         UpdateUI();
     }
 
     public void SetupBattle(GhostBehaviour ghost)
     {
-        enemyStats = gameObject.GetComponent<EnemyStats>();
-        if (enemyStats != null)
+        EnemyStats enemyStatsComponent = gameObject.GetComponent<EnemyStats>(); // Local Variable
+        if (enemyStatsComponent == null)
         {
-            int playerLevel = PlayerStats.Instance.level; // Get player's level
-            enemyStats.Initialize(playerLevel);
+            Debug.LogError("EnemyStats component not found on this GameObject!");
+            return; // Exit if component is missing
         }
 
-        StartCoroutine(StartBattle(enemyStats, ghost));
-    }
+        int playerLevel = PlayerStats.Instance.level;
+        enemyStatsComponent.Initialize(playerLevel);
 
+        StartCoroutine(StartBattle(enemyStatsComponent, ghost)); // Pass the local variable
+    }
     private void UpdateUI()
     {
         // Update turn text

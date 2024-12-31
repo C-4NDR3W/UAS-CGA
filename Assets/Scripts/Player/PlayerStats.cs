@@ -75,6 +75,7 @@ public class PlayerStats : MonoBehaviour
         // Generate a random skill from the available options
         Skill newSkill = skillManager.GenerateSkill(skillManager.GetRandomSkillName(), currentTier);
         Debug.Log($"Reward skill: {newSkill.name} (Tier {newSkill.tier})");
+        skills.Add(newSkill);
 
     }
 
