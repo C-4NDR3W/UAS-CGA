@@ -71,6 +71,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 706533761382485649}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7976205035464531866}
   m_SourcePrefab: {fileID: 100100000, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
 --- !u!1 &6254735099397954883 stripped
 GameObject:
@@ -89,3 +92,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8175d2a7d594a84ca7cce138e7c5099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dialogBox: {fileID: 0}
+  doctorUIPanel: {fileID: 0}
+  dialogText: {fileID: 0}
+--- !u!65 &7976205035464531866
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6254735099397954883}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

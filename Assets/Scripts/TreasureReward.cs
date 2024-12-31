@@ -70,7 +70,8 @@ public class TreasureReward : MonoBehaviour
             dialogText.text = $"You got Coins!";
         }
 
-        Invoke(nameof(HideDialog), 2f);
+        Destroy(gameObject);
+        Invoke(nameof(HideDialog), 1f);
     }
 
     void HideDialog()

@@ -37,6 +37,7 @@ public class Skill
                 player.currentHealth = Mathf.Min(player.currentHealth + basePower, player.maxHealth);
                 player.healthBar.SetHealth(player.currentHealth);
                 Debug.Log($"Player healed for {basePower} HP (Tier {tier}).");
+                this.currentCooldown = cooldownTurns;
                 break;
 
             case "Pound":
@@ -44,6 +45,8 @@ public class Skill
                 {
                     target.TakeDamage(basePower);
                     Debug.Log($"Dealt {basePower} damage to the enemy (Tier {tier}).");
+
+                    this.currentCooldown = cooldownTurns;
                 }
                 break;
 
@@ -52,13 +55,17 @@ public class Skill
                 foreach (Skill playerSkill in player.skills)
                 {
                     playerSkill.currentCooldown = Mathf.Clamp(playerSkill.currentCooldown - reductionAmount, 1, 3);
+
+                    this.currentCooldown = cooldownTurns;
                 }
                 Debug.Log($"Player is hastened (Tier {tier}). All skill cooldowns reduced.");
                 break;
             case "Intimidate":
+                this.currentCooldown = cooldownTurns;
                 Debug.Log($"Enemy Defenses Lowered.");
                 break;
             case "Inverse":
+                this.currentCooldown = cooldownTurns;
                 Debug.Log("Inverse is Used. All attacks and healing effects are reversed.");
                 break;
             default:

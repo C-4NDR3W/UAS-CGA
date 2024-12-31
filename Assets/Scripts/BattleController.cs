@@ -45,7 +45,7 @@ public class BattleController : MonoBehaviour
     private UIPanelState currentUIPanelState = UIPanelState.Default;
     public bool isIntimidated = false;
     public bool isInversed = false;
-
+    public bool isSelectingNewSkill = false;
     private void Start()
     {
         if (battleUIPanel == null)
@@ -186,16 +186,32 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    private void OpenSkillPanel()
+    private void OpenSkillPanel(bool selectNewSkill = false)
     {
-        // Switch to the skill panel
         currentUIPanelState = UIPanelState.Skills;
 
         List<Skill> skills = PlayerStats.Instance.skills;
+        if (selectNewSkill)
+        {
+            attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name + skills[0].tier : "Skill 1";
+            skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name + skills[1].tier : "Skill 2";
+            guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name + skills[2].tier : "Skill 3";
+            runButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 3 ? skills[3].name + skills[3].tier : "Back";
 
-        attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name : "Skill 1";
-        skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name : "Skill 2";
-        guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name : "Skill 3";
+            attackButton.onClick.RemoveAllListeners();
+            skillButton.onClick.RemoveAllListeners();
+            guardButton.onClick.RemoveAllListeners();
+            runButton.onClick.RemoveAllListeners();
+
+            attackButton.onClick.AddListener(() => ForgetSkill(0));
+            skillButton.onClick.AddListener(() => ForgetSkill(1));
+            guardButton.onClick.AddListener(() => ForgetSkill(2));
+            runButton.onClick.AddListener(() => ForgetSkill(3));
+        }
+
+        attackButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 0 ? skills[0].name + skills[0].tier : "Skill 1";
+        skillButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 1 ? skills[1].name + skills[1].tier : "Skill 2";
+        guardButton.GetComponentInChildren<TMP_Text>().text = skills.Count > 2 ? skills[2].name + skills[2].tier : "Skill 3";
         runButton.GetComponentInChildren<TMP_Text>().text = "Back";
 
         attackButton.onClick.RemoveAllListeners();
@@ -209,6 +225,20 @@ public class BattleController : MonoBehaviour
         runButton.onClick.AddListener(OpenDefaultPanel);
     }
 
+    private void ForgetSkill(int skillIndex)
+    {
+        List<Skill> skills = PlayerStats.Instance.skills;
+        if (skillIndex < skills.Count)
+        {
+            Skill selectedSkill = skills[skillIndex];
+            StartCoroutine(PlayerForgetSKill(selectedSkill));
+        }
+    }
+    IEnumerator PlayerForgetSKill(Skill skill)
+    {
+        yield return new WaitForSeconds(1f);
+
+    }
     private void OpenDefaultPanel()
     {
         // Switch back to the default panel
@@ -249,7 +279,7 @@ public class BattleController : MonoBehaviour
             dialogText.text = $"Cannot use {skill.name}! Cooldown: {skill.currentCooldown} turns left.";
             yield return new WaitForSeconds(1.5f);
             dialogBox.SetActive(false);
-            yield break; // Exit the coroutine if the skill is on cooldown
+            yield break;
         }
 
         dialogText.text = $"Player uses {skill.name}!";
@@ -259,22 +289,21 @@ public class BattleController : MonoBehaviour
         if (skill.name == "Intimidate")
         {
             isIntimidated = true;
+            PlayerStats.Instance.UseSkill(skill, enemyStats);
             dialogText.text = $"Enemies will take more damage the next time you attack!";
             yield return new WaitForSeconds(1f);
-            UpdateSkillUI();
         }
         else if (skill.name == "Inverse")
         {
             isInversed = true;
+            PlayerStats.Instance.UseSkill(skill, enemyStats);
             dialogText.text = $"Next Enemy action will be reversed!";
             yield return new WaitForSeconds(1f);
-            UpdateSkillUI();
         }
         else
         {
             // Use the skill and update UI accordingly
             PlayerStats.Instance.UseSkill(skill, enemyStats);
-            UpdateSkillUI();
         }
 
         yield return new WaitForSeconds(1.5f);
@@ -424,9 +453,9 @@ public class BattleController : MonoBehaviour
             if (isInversed)
             {
                 int damage = enemyStats.attackPower;
-                enemyStats.TakeDamage(damage);
+                PlayerStats.Instance.InversedHeal(damage);
                 dialogBox.SetActive(true);
-                dialogText.text = "Enemy attacked while Inversed!";
+                dialogText.text = "Enemy attacked while Inversed! You healed instead";
                 isInversed = false;
             }
             else
@@ -457,7 +486,7 @@ public class BattleController : MonoBehaviour
             state = BattleState.PLAYERTURN;
             Debug.Log("Player's Turn");
         }
-
+        PlayerStats.Instance.ReduceCooldowns();
         UpdateUI();
         isGuarding = false;
     }
@@ -472,7 +501,17 @@ public class BattleController : MonoBehaviour
             Debug.Log("player wins!");
             PlayerStats.Instance.AddCoins(1);
             PlayerStats.Instance.AddExperience(enemyStats.getXP());
-            PlayerStats.Instance.RewardSkillAfterBattle();
+            if (PlayerStats.Instance.skills.Count < 3)
+            {
+                PlayerStats.Instance.RewardSkillAfterBattle();
+            }
+            else
+            {
+                isSelectingNewSkill = true;
+                dialogText.text = "You cannot hold more than 3 skills, please select one to forget.";
+                yield return new WaitForSeconds(1f);
+                OpenSkillPanel(isSelectingNewSkill);
+            }
         }
         else if (state == BattleState.LOSE)
         {
@@ -588,37 +627,4 @@ public class BattleController : MonoBehaviour
             enemyHealth.text = $" {enemyStats.currentHp}/{enemyStats.maxHp} ";
         }
     }
-
-    private void UpdateSkillUI()
-    {
-        List<Skill> skills = PlayerStats.Instance.skills;
-
-        // Ensure the number of skills matches available buttons
-        if (currentUIPanelState == UIPanelState.Skills) // Only apply in Skills state
-        {
-            if (skills.Count > 0)
-            {
-                attackButton.interactable = skills[0].currentCooldown == 0;
-                attackButton.GetComponentInChildren<TMP_Text>().text = $"{skills[0].name} {(skills[0].currentCooldown > 0 ? $"({skills[0].currentCooldown} turns)" : "")}";
-            }
-            if (skills.Count > 1)
-            {
-                skillButton.interactable = skills[1].currentCooldown == 0;
-                skillButton.GetComponentInChildren<TMP_Text>().text = $"{skills[1].name} {(skills[1].currentCooldown > 0 ? $"({skills[1].currentCooldown} turns)" : "")}";
-            }
-            if (skills.Count > 2)
-            {
-                guardButton.interactable = skills[2].currentCooldown == 0;
-                guardButton.GetComponentInChildren<TMP_Text>().text = $"{skills[2].name} {(skills[2].currentCooldown > 0 ? $"({skills[2].currentCooldown} turns)" : "")}";
-            }
-        }
-        else
-        {
-            // Ensure buttons are always interactable in the default panel
-            attackButton.interactable = true;
-            skillButton.interactable = true;
-            guardButton.interactable = true;
-        }
-    }
-
 }
