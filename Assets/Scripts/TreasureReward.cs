@@ -8,6 +8,7 @@ public class TreasureReward : MonoBehaviour
     public GameObject dialogBox;
     public GameObject doctorUIPanel;
     public TMP_Text dialogText;
+    public GameObject ghostPrefab;
 
     void Start()
     {
@@ -52,25 +53,66 @@ public class TreasureReward : MonoBehaviour
     void TreasureRewardProcess()
     {
         int missingHp = PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth;
-        float healChance = 0.5f;
-        // float coinChance = 0.5f; //make space for other features
+        float healChance = 0.25f; //0.25
+        float coinChance = 0.25f; //make space for other features //0.5
+        float mimicChance = 0.25f; //a sudden enemy appears! //0.75
+        float xpChance = 0.15f; //0.90
+        float permanentAtkBuffChance = 0.05f;
+        // float permanentHpBuffChance = 0.05f; //1.0 unused because it is the remaining 0.05 
+
 
         float actionRoll = Random.value;
 
         if (actionRoll < healChance)
         {
+            // Heal outcome
             PlayerStats.Instance.currentHealth = Mathf.Min(PlayerStats.Instance.currentHealth + missingHp, PlayerStats.Instance.maxHealth);
             Debug.Log("Healed for " + missingHp + " HP");
-            dialogText.text = $"You got healed!";
+            dialogText.text = "You got healed!";
+        }
+        else if (actionRoll < healChance + coinChance)
+        {
+            // Coins outcome
+            int randomMult = Random.Range(1, 10);
+            PlayerStats.Instance.AddCoins(randomMult);
+            Debug.Log($"You got {randomMult} coins!");
+            dialogText.text = "You got Coins!";
+        }
+        else if (actionRoll < healChance + coinChance + mimicChance)
+        {
+            if (ghostPrefab != null)
+            {
+                Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+                Debug.Log("A Mimic (Ghost) has spawned at the treasure chest's location!");
+                dialogText.text = "A Mimic Appears!";
+            }
+            else
+            {
+                Debug.LogError("Ghost prefab (Mimic) is not assigned in the Inspector!");
+            }
+        }
+        else if (actionRoll < healChance + coinChance + mimicChance + xpChance)
+        {
+            int xpAmount = PlayerStats.Instance.level * 10;
+            PlayerStats.Instance.AddExperience(xpAmount);
+            Debug.Log($"You gained {xpAmount} XP!");
+            dialogText.text = "You gained XP!";
+        }
+        else if (actionRoll < healChance + coinChance + mimicChance + xpChance + permanentAtkBuffChance)
+        {
+            // Permanent attack buff outcome
+            PlayerStats.Instance.attackPower += 3; // Assuming permanentAttack exists
+            Debug.Log("Your attack power permanently increased by 3!");
+            dialogText.text = "Your attack power permanently increased by 3!";
         }
         else
         {
-            int randomMult = Random.Range(1, 10);
-            PlayerStats.Instance.AddCoins(randomMult);
-            dialogText.text = $"You got Coins!";
+            PlayerStats.Instance.maxHealth += 10; // Assuming permanentMaxHealth exists
+            Debug.Log("Your max health permanently increased by 10!");
+            dialogText.text = "Your max health permanently increased by 10!";
         }
 
-        //skill issue, just trigger this multiple times before destroy glhf
+        // Hide the dialog and destroy the chest
         Invoke(nameof(HideDialog), 1f);
         Destroy(gameObject, 1.1f);
     }

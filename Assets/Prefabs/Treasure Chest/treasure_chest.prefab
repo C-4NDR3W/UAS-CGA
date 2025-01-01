@@ -95,6 +95,7 @@ MonoBehaviour:
   dialogBox: {fileID: 0}
   doctorUIPanel: {fileID: 0}
   dialogText: {fileID: 0}
+  ghostPrefab: {fileID: 8795188415640614061, guid: da7dce71e8c32a94baa2a5c04e5cf81e, type: 3}
 --- !u!65 &7976205035464531866
 BoxCollider:
   m_ObjectHideFlags: 0
