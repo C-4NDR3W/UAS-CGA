@@ -43,9 +43,9 @@ public class BattleController : MonoBehaviour
 
     public InGameAudio inGameAudio;
     private UIPanelState currentUIPanelState = UIPanelState.Default;
-    public bool isIntimidated = false;
-    public bool isInversed = false;
-    public bool isSelectingNewSkill = false;
+    private bool isIntimidated = false;
+    private bool isInversed = false;
+    private bool isSelectingNewSkill = false;
     private void Start()
     {
         if (battleUIPanel == null)
@@ -115,7 +115,10 @@ public class BattleController : MonoBehaviour
                 enemyStats.TakeIntimidateDamage(PlayerStats.Instance.attackPower);
                 isIntimidated = false;
             }
-            enemyStats.TakeDamage(PlayerStats.Instance.attackPower);
+            else
+            {
+                enemyStats.TakeDamage(PlayerStats.Instance.attackPower);
+            }
             if (dialogText != null)
             {
                 dialogBox.SetActive(true);
