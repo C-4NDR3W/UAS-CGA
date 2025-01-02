@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 
 public class PlayerStats : MonoBehaviour
 {
     public static PlayerStats Instance;
+    public GameObject normalUIPanel;
 
     // Stats Pacman
     public int maxHealth = 100;
@@ -13,17 +15,21 @@ public class PlayerStats : MonoBehaviour
     public int coins = 0;
     public int level = 1;
     public int xpPoints = 0;
-    public int xpToNextLevel = 25;
+    public int xpToNextLevel;
     public List<Skill> skills = new List<Skill>();
     // private int maxSkills = 3; //seems unused
 
     public HealthBar healthBar;
     public TMP_Text coinText;
 
+    public GameObject dialogBox;
+    public TMP_Text dialogText;
+
     void Awake()
-    {   
+    {
         Instance = this;
         DontDestroyOnLoad(gameObject); // Tetap ada di semua scene
+        xpToNextLevel = 25;
         InitializeUI();
 
         currentHealth = maxHealth;
@@ -89,6 +95,8 @@ public class PlayerStats : MonoBehaviour
             // Find the HealthBar and CoinText components
             HealthBar foundHealthBar = normalUI.GetComponentInChildren<HealthBar>();
             TMP_Text foundCoinText = normalUI.GetComponentInChildren<TMP_Text>();
+            dialogBox = normalUI.transform.Find("LevelUp TextBox").gameObject;
+            dialogText = dialogBox.GetComponentInChildren<TMP_Text>();
 
             // Assign the found UI elements to PlayerStats
             if (foundHealthBar != null && foundCoinText != null)
@@ -170,7 +178,17 @@ public class PlayerStats : MonoBehaviour
         maxHealth += 20; // Increase HP on level up
         attackPower += 10; // Increase attack power
         currentHealth = maxHealth; // Fully heal the player
+
+        StartCoroutine(ShowLevelUpDialog());
     }
 
+    private IEnumerator ShowLevelUpDialog()
+    {
+        dialogBox.SetActive(true);
+        dialogText.SetText("Level Up");
 
+        yield return new WaitForSeconds(1.5f); // Wait for 1.5 seconds
+
+        dialogBox.SetActive(false);
+    }
 }
