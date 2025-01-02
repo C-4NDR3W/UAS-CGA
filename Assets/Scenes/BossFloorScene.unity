@@ -2425,7 +2425,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 566225784}
-  - component: {fileID: 566225783}
+  - component: {fileID: 566225785}
   m_Layer: 0
   m_Name: BattleController
   m_TagString: Untagged
@@ -2433,33 +2433,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &566225783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 566225782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c690ebff962c1241b16381795d57726, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  treasureChest: {fileID: 919132149155446097, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
-  state: 0
-  battleUIPanel: {fileID: 0}
-  doctorUIPanel: {fileID: 0}
-  dialogBox: {fileID: 0}
-  dialogText: {fileID: 0}
-  attackButton: {fileID: 0}
-  skillButton: {fileID: 0}
-  guardButton: {fileID: 0}
-  runButton: {fileID: 0}
-  playerButton: {fileID: 0}
-  enemyHealth: {fileID: 0}
-  turn: {fileID: 0}
-  gameOverUIPanel: {fileID: 0}
-  inGameAudio: {fileID: 0}
 --- !u!4 &566225784
 Transform:
   m_ObjectHideFlags: 0
@@ -2475,6 +2448,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &566225785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566225782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a3ee64e0d2fe364ea2ad9cd6ffacac5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &610042102
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,7 +23,7 @@ public class Skill
         this.effect = effect;
     }
 
-    public void UseSkill(PlayerStats player, EnemyStats target = null)
+    public void UseSkill(PlayerStats player, BaseEnemyStats target = null)
     {
         if (currentCooldown > 0)
         {

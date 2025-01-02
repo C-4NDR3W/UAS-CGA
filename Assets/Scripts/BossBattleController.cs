@@ -3,49 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
-public enum BattleState { START, PLAYERTURN, ENEMYTURN, WIN, LOSE }
-
-public enum UIPanelState
+public class BossBattleController : MonoBehaviour //largely a copy of BattleController with special boss-specific actions and smaller code overall(hopefully)
 {
-    Default,
-    Skills
-}
 
-
-public class BattleController : MonoBehaviour
-{
-    //public static BattleController Instance;
-
-    public GameObject treasureChest;
+    private Vector3 originalPosition; // To store the original position of Pacman
+    private Quaternion originalRotation; // To store the original rotation of Pacman
+    public bool isBattle = false; // Bool to check if the battle is active
+    private PlayerMovement playerMovement;
+    private BossBehaviour currentBoss;
+    private BossStats bossStats;
     public BattleState state;
     public GameObject battleUIPanel;
-    private EnemyStats enemyStats;
-    private bool isGuarding = false; // Tracks if the player is guarding
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
-    private PlayerMovement playerMovement;
 
     public GameObject doctorUIPanel;
     public GameObject dialogBox;
     public TMP_Text dialogText;
+
     public Button attackButton;
     public Button skillButton;
     public Button guardButton;
     public Button runButton;
-    public Button playerButton;
-    public TMP_Text enemyHealth;
+
+    public TMP_Text bossHealth;
     public TMP_Text turn;
-
-    public GameObject gameOverUIPanel;
-    private GhostBehaviour currentGhost;
-
     public InGameAudio inGameAudio;
+
     private UIPanelState currentUIPanelState = UIPanelState.Default;
+    public GameObject gameOverUIPanel;
+
     private bool isIntimidated = false;
     private bool isInversed = false;
     private bool isSelectingNewSkill = false;
+    private bool isGuarding = false;
+
     private void Start()
     {
         if (battleUIPanel == null)
@@ -68,12 +59,58 @@ public class BattleController : MonoBehaviour
             dialogBox.SetActive(false);
         }
 
-        enemyHealth = battleUIPanel.transform.Find("Enemy Health").GetComponent<TMP_Text>();
+        bossHealth = battleUIPanel.transform.Find("Enemy Health").GetComponent<TMP_Text>();
         turn = battleUIPanel.transform.Find("Turn").GetComponent<TMP_Text>();
 
-
-
         inGameAudio = FindObjectOfType<InGameAudio>();
+    }
+
+
+    public void SetPlayerState(Vector3 position, Quaternion rotation, PlayerMovement movement)
+    {
+        originalPosition = position;
+        originalRotation = rotation;
+        playerMovement = movement;
+    }
+
+    public void SetupBattle(BossBehaviour boss)
+    {
+        bossStats = gameObject.GetComponent<BossStats>(); // Local Variable
+        if (bossStats == null)
+        {
+            Debug.LogError("BossStats component not found on this GameObject!");
+            return; // Exit if component is missing
+        }
+
+        int playerLevel = PlayerStats.Instance.level;
+        bossStats.Initialize(playerLevel);
+
+        StartCoroutine(StartBattle(bossStats, boss)); // Pass the local variable
+    }
+
+    public IEnumerator StartBattle(BossStats bossStatsComponent, BossBehaviour boss)
+    {
+
+        this.currentBoss = boss;
+        state = BattleState.START; //ensures it starts on the START state
+
+        battleUIPanel.SetActive(true);
+        doctorUIPanel.SetActive(false);
+
+        // Reset UI components
+        dialogBox.SetActive(false);
+        dialogText.text = string.Empty;
+
+        // Delay to ensure UI updates are visible
+        yield return new WaitForEndOfFrame();
+
+        state = BattleState.PLAYERTURN;
+        Debug.Log("Player Turn Starts");
+        Debug.Log("State changed to: " + state);
+
+        InitializeBattleUI();
+        OpenDefaultPanel(); // Ensure default panel is displayed
+        UpdateUI();
     }
 
     public void InitializeBattleUI()
@@ -93,6 +130,50 @@ public class BattleController : MonoBehaviour
         Debug.Log("Battle UI initialized and listeners attached.");
     }
 
+    private void OpenDefaultPanel()
+    {
+        // Switch back to the default panel
+        currentUIPanelState = UIPanelState.Default;
+
+        attackButton.GetComponentInChildren<TMP_Text>().text = "Attack";
+        skillButton.GetComponentInChildren<TMP_Text>().text = "Skill";
+        guardButton.GetComponentInChildren<TMP_Text>().text = "Guard";
+        runButton.GetComponentInChildren<TMP_Text>().text = "Run";
+
+        attackButton.onClick.RemoveAllListeners();
+        skillButton.onClick.RemoveAllListeners();
+        guardButton.onClick.RemoveAllListeners();
+        runButton.onClick.RemoveAllListeners();
+
+        attackButton.onClick.AddListener(OnAttackButton);
+        skillButton.onClick.AddListener(OnSkillButton);
+        guardButton.onClick.AddListener(OnGuardButton);
+        runButton.onClick.AddListener(OnRunButton);
+    }
+
+    private void UpdateUI()
+    {
+        // Update turn text
+        switch (state)
+        {
+            case BattleState.PLAYERTURN:
+                turn.text = "Player";
+                break;
+            case BattleState.ENEMYTURN:
+                turn.text = "Boss";
+                break;
+            default:
+                turn.text = "Battle Start";
+                break;
+        }
+
+        // Update enemy health text
+        if (bossStats != null)
+        {
+            bossHealth.text = $" {bossStats.currentHp}/{bossStats.maxHp} ";
+        }
+    }
+
     public void OnAttackButton()
     {
         Debug.Log("Player Attack Button");
@@ -105,47 +186,6 @@ public class BattleController : MonoBehaviour
         StartCoroutine(PlayerAttack());
         Debug.Log("Player Attacked! " + state);
     }
-
-    IEnumerator PlayerAttack()
-    {
-        if (enemyStats != null)
-        {
-            if (isIntimidated)
-            {
-                enemyStats.TakeIntimidateDamage(PlayerStats.Instance.attackPower);
-                isIntimidated = false;
-            }
-            else
-            {
-                enemyStats.TakeDamage(PlayerStats.Instance.attackPower);
-            }
-            if (dialogText != null)
-            {
-                dialogBox.SetActive(true);
-                dialogText.text = "Player attacks the enemy!";
-            }
-        }
-        yield return new WaitForSeconds(1.5f);
-
-        if (dialogBox != null)
-        {
-            dialogBox.SetActive(false);
-        }
-
-        UpdateUI();
-
-        if (enemyStats != null && enemyStats.isDead())
-        {
-            state = BattleState.WIN;
-            StartCoroutine(EndBattle());
-        }
-        else
-        {
-            StartCoroutine(EnemyTurn());
-            Debug.Log("Transferring to Enemy Turn: " + state);
-        }
-    }
-
     public void OnGuardButton()
     {
         if (state != BattleState.PLAYERTURN)
@@ -155,28 +195,6 @@ public class BattleController : MonoBehaviour
         inGameAudio.PlayClickSound();
         StartCoroutine(PlayerGuard());
     }
-
-    IEnumerator PlayerGuard()
-    {
-        isGuarding = true;
-        if (dialogText != null)
-        {
-            dialogBox.SetActive(true);
-            dialogText.text = "Player is guarding!";
-        }
-        yield return new WaitForSeconds(1.5f);
-
-        if (dialogBox != null)
-        {
-            dialogBox.SetActive(false);
-        }
-
-        UpdateUI();
-
-        state = BattleState.ENEMYTURN;
-        StartCoroutine(EnemyTurn());
-    }
-
     public void OnSkillButton()
     {
         if (currentUIPanelState == UIPanelState.Default)
@@ -187,6 +205,54 @@ public class BattleController : MonoBehaviour
         else
         {
             OpenDefaultPanel();
+        }
+    }
+    public void OnRunButton()
+    {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        inGameAudio.PlayClickSound();
+        StartCoroutine(PlayerRun());
+    }
+    IEnumerator PlayerAttack()
+    {
+        if (bossStats != null)
+        {
+            if (isIntimidated)
+            {
+                bossStats.TakeIntimidateDamage(PlayerStats.Instance.attackPower);
+                isIntimidated = false;
+            }
+            else
+            {
+                bossStats.TakeDamage(PlayerStats.Instance.attackPower);
+            }
+            if (dialogText != null)
+            {
+                dialogBox.SetActive(true);
+                dialogText.text = "Player attacks the Boss!";
+            }
+        }
+        yield return new WaitForSeconds(1.5f);
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
+
+        UpdateUI();
+
+        if (bossStats != null && bossStats.isDead())
+        {
+            state = BattleState.WIN;
+            StartCoroutine(EndBattle());
+        }
+        else
+        {
+            StartCoroutine(EnemyTurn());
+            Debug.Log("Transferring to Enemy Turn: " + state);
         }
     }
 
@@ -278,28 +344,6 @@ public class BattleController : MonoBehaviour
         isSelectingNewSkill = false;
     }
 
-
-
-    private void OpenDefaultPanel()
-    {
-        // Switch back to the default panel
-        currentUIPanelState = UIPanelState.Default;
-
-        attackButton.GetComponentInChildren<TMP_Text>().text = "Attack";
-        skillButton.GetComponentInChildren<TMP_Text>().text = "Skill";
-        guardButton.GetComponentInChildren<TMP_Text>().text = "Guard";
-        runButton.GetComponentInChildren<TMP_Text>().text = "Run";
-
-        attackButton.onClick.RemoveAllListeners();
-        skillButton.onClick.RemoveAllListeners();
-        guardButton.onClick.RemoveAllListeners();
-        runButton.onClick.RemoveAllListeners();
-
-        attackButton.onClick.AddListener(OnAttackButton);
-        skillButton.onClick.AddListener(OnSkillButton);
-        guardButton.onClick.AddListener(OnGuardButton);
-        runButton.onClick.AddListener(OnRunButton);
-    }
     private void UseSkill(int skillIndex)
     {
         List<Skill> skills = PlayerStats.Instance.skills;
@@ -330,21 +374,21 @@ public class BattleController : MonoBehaviour
         if (skill.name == "Intimidate")
         {
             isIntimidated = true;
-            PlayerStats.Instance.UseSkill(skill, enemyStats);
+            PlayerStats.Instance.UseSkill(skill, bossStats);
             dialogText.text = $"Enemies will take more damage the next time you attack!";
             yield return new WaitForSeconds(1f);
         }
         else if (skill.name == "Inverse")
         {
             isInversed = true;
-            PlayerStats.Instance.UseSkill(skill, enemyStats);
+            PlayerStats.Instance.UseSkill(skill, bossStats);
             dialogText.text = $"Next Enemy action will be reversed!";
             yield return new WaitForSeconds(1f);
         }
         else
         {
             // Use the skill and update UI accordingly
-            PlayerStats.Instance.UseSkill(skill, enemyStats);
+            PlayerStats.Instance.UseSkill(skill, bossStats);
         }
 
         yield return new WaitForSeconds(1.5f);
@@ -355,7 +399,7 @@ public class BattleController : MonoBehaviour
 
         // Return to the default panel
         OpenDefaultPanel();
-        if (enemyStats != null && enemyStats.isDead())
+        if (bossStats != null && bossStats.isDead())
         {
             state = BattleState.WIN;
             StartCoroutine(EndBattle());
@@ -367,16 +411,25 @@ public class BattleController : MonoBehaviour
         }
     }
 
-
-
-    public void OnRunButton()
+    IEnumerator PlayerGuard()
     {
-        if (state != BattleState.PLAYERTURN)
+        isGuarding = true;
+        if (dialogText != null)
         {
-            return;
+            dialogBox.SetActive(true);
+            dialogText.text = "Player is guarding!";
         }
-        inGameAudio.PlayClickSound();
-        StartCoroutine(PlayerRun());
+        yield return new WaitForSeconds(1.5f);
+
+        if (dialogBox != null)
+        {
+            dialogBox.SetActive(false);
+        }
+
+        UpdateUI();
+
+        state = BattleState.ENEMYTURN;
+        StartCoroutine(EnemyTurn());
     }
     IEnumerator PlayerRun()
     {
@@ -391,7 +444,7 @@ public class BattleController : MonoBehaviour
         {
             dialogBox.SetActive(false);
         }
-        if (enemyStats.level <= PlayerStats.Instance.level)
+        if (bossStats.level <= PlayerStats.Instance.level)
         {
             runChance = 0.8f;
         }
@@ -413,124 +466,6 @@ public class BattleController : MonoBehaviour
         UpdateUI();
     }
 
-    IEnumerator EnemyTurn()
-    {
-        state = BattleState.ENEMYTURN;
-        UpdateUI();
-
-        yield return new WaitForSeconds(1f);
-
-
-        /// Determine the enemy's action based on conditions
-        float missingHpPercentage = (float)(enemyStats.maxHp - enemyStats.currentHp) / enemyStats.maxHp;
-        float healChance = 0f;
-
-        if (missingHpPercentage >= 0.7f) // 70% missing HP
-        {
-            healChance = 0.3f; // Higher chance to heal
-        }
-        else if (missingHpPercentage >= 0.15f) // 15% missing HP
-        {
-            healChance = 0.1f; // Lower chance to heal
-        }
-        bool playerIsGuarding = isGuarding;
-
-        // Adjust guard break chance
-        float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
-
-        // Randomly decide the action
-        float actionRoll = Random.value;
-        if (actionRoll < healChance)
-        {
-            if (isInversed)
-            {
-                enemyStats.TakeDamage(enemyStats.HealAmount());
-                isInversed = false;
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy healed itself!. But it was Inversed!";
-            }
-            else
-            {
-                enemyStats.HealEnemy();
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy healed itself!";
-            }
-
-            yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
-        }
-        else if (actionRoll < guardBreakChance) // Guard break with a dynamic low chance
-        {
-            if (isInversed)
-            {
-                int damage = enemyStats.GuardBreak(isGuarding);
-                enemyStats.TakeDamage(damage);
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy used Guard Break while Inversed!";
-                isInversed = false;
-            }
-            else
-            {
-                int damage = enemyStats.GuardBreak(isGuarding);
-                PlayerStats.Instance.TakeDamage(damage, false);
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy used Guard Break!";
-
-            }
-
-            yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
-        }
-        else // Default action is attack
-        {
-            if (isInversed)
-            {
-                int damage = enemyStats.attackPower;
-                PlayerStats.Instance.InversedHeal(damage);
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy attacked while Inversed! You healed instead";
-                isInversed = false;
-            }
-            else
-            {
-                PlayerStats.Instance.TakeDamage(enemyStats.attackPower, playerIsGuarding);
-                dialogBox.SetActive(true);
-                dialogText.text = "Enemy attacked!";
-            }
-
-            yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
-        }
-
-        yield return new WaitForSeconds(1f);
-
-        // Check if the player is defeated
-        if (PlayerStats.Instance.currentHealth <= 0)
-        {
-            state = BattleState.LOSE;
-            StartCoroutine(EndBattle());
-        }
-        else
-        {
-            state = BattleState.PLAYERTURN;
-            Debug.Log("Player's Turn");
-        }
-        PlayerStats.Instance.ReduceCooldowns();
-        UpdateUI();
-        isGuarding = false;
-    }
     private IEnumerator EndBattle()
     {
         if (state == BattleState.WIN)
@@ -540,8 +475,8 @@ public class BattleController : MonoBehaviour
             yield return new WaitForSeconds(1f); // Wait for 1 second
 
             Debug.Log("player wins!");
-            PlayerStats.Instance.AddCoins(enemyStats.level);
-            PlayerStats.Instance.AddExperience(enemyStats.getXP());
+            PlayerStats.Instance.AddCoins(bossStats.level);
+            PlayerStats.Instance.AddExperience(bossStats.getXP());
             if (PlayerStats.Instance.skills.Count < 3)
             {
                 PlayerStats.Instance.RewardSkillAfterBattle();
@@ -576,11 +511,11 @@ public class BattleController : MonoBehaviour
         }
 
         battleUIPanel.SetActive(false);
-        GhostBehaviour ghost = FindObjectOfType<GhostBehaviour>();
-        if (ghost != null)
+        BossBehaviour boss = FindObjectOfType<BossBehaviour>();
+        if (boss != null)
         {
-            currentGhost.OnBattleEnd();
-            currentGhost = null;
+            currentBoss.OnBattleEnd();
+            currentBoss = null;
         }
 
         // Reset battle states
@@ -591,9 +526,9 @@ public class BattleController : MonoBehaviour
         ResetPacmanPosition();
 
         // Reset enemy stats
-        if (enemyStats != null)
+        if (bossStats != null)
         {
-            enemyStats = null;
+            bossStats = null;
         }
 
         if (dialogBox != null)
@@ -614,75 +549,123 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    public void SetPlayerState(Vector3 position, Quaternion rotation, PlayerMovement movement)
+    IEnumerator EnemyTurn() //UNFINISHED
     {
-        originalPosition = position;
-        originalRotation = rotation;
-        playerMovement = movement;
-    }
-
-    public IEnumerator StartBattle(EnemyStats enemy, GhostBehaviour ghost)
-    {
-        enemyStats = enemy;
-        state = BattleState.START;
-
-        battleUIPanel.SetActive(true);
-        doctorUIPanel.SetActive(false);
-
-        // Reset UI components
-        dialogBox.SetActive(false);
-        dialogText.text = string.Empty;
-
-        // Delay to ensure UI updates are visible
-        yield return new WaitForEndOfFrame();
-
-        yield return new WaitForEndOfFrame();
-
-        state = BattleState.PLAYERTURN;
-        Debug.Log("Player Turn Starts");
-        Debug.Log("State changed to: " + state);
-
-        this.currentGhost = ghost;
-
-        InitializeBattleUI();
-        OpenDefaultPanel(); // Ensure default panel is displayed
+        state = BattleState.ENEMYTURN;
         UpdateUI();
-    }
 
-    public void SetupBattle(GhostBehaviour ghost)
-    {
-        EnemyStats enemyStatsComponent = gameObject.GetComponent<EnemyStats>(); // Local Variable
-        if (enemyStatsComponent == null)
+        yield return new WaitForSeconds(1f);
+
+
+        /// Determine the enemy's action based on conditions
+        float missingHpPercentage = (float)(bossStats.maxHp - bossStats.currentHp) / bossStats.maxHp;
+        float healChance = 0f;
+
+        if (missingHpPercentage >= 0.7f) // 70% missing HP
         {
-            Debug.LogError("EnemyStats component not found on this GameObject!");
-            return; // Exit if component is missing
+            healChance = 0.3f; // Higher chance to heal
+        }
+        else if (missingHpPercentage >= 0.15f) // 15% missing HP
+        {
+            healChance = 0.1f; // Lower chance to heal
+        }
+        bool playerIsGuarding = isGuarding;
+
+        // Adjust guard break chance
+        float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
+
+        // Randomly decide the action
+        float actionRoll = Random.value;
+        if (actionRoll < healChance)
+        {
+            if (isInversed)
+            {
+                bossStats.TakeDamage(bossStats.HealAmount());
+                isInversed = false;
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy healed itself!. But it was Inversed!";
+            }
+            else
+            {
+                bossStats.HealEnemy();
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy healed itself!";
+            }
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
+        }
+        else if (actionRoll < guardBreakChance) // Guard break with a dynamic low chance
+        {
+            if (isInversed)
+            {
+                int damage = bossStats.GuardBreak(isGuarding);
+                bossStats.TakeDamage(damage);
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy used Guard Break while Inversed!";
+                isInversed = false;
+            }
+            else
+            {
+                int damage = bossStats.GuardBreak(isGuarding);
+                PlayerStats.Instance.TakeDamage(damage, false);
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy used Guard Break!";
+
+            }
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
+        }
+        else // Default action is attack
+        {
+            if (isInversed)
+            {
+                int damage = bossStats.attackPower;
+                PlayerStats.Instance.InversedHeal(damage);
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy attacked while Inversed! You healed instead";
+                isInversed = false;
+            }
+            else
+            {
+                PlayerStats.Instance.TakeDamage(bossStats.attackPower, playerIsGuarding);
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy attacked!";
+            }
+
+            yield return new WaitForSeconds(1.5f);
+
+            if (dialogBox != null)
+            {
+                dialogBox.SetActive(false);
+            }
         }
 
-        int playerLevel = PlayerStats.Instance.level;
-        enemyStatsComponent.Initialize(playerLevel);
+        yield return new WaitForSeconds(1f);
 
-        StartCoroutine(StartBattle(enemyStatsComponent, ghost)); // Pass the local variable
-    }
-    private void UpdateUI()
-    {
-        // Update turn text
-        switch (state)
+        // Check if the player is defeated
+        if (PlayerStats.Instance.currentHealth <= 0)
         {
-            case BattleState.PLAYERTURN:
-                turn.text = "Player";
-                break;
-            case BattleState.ENEMYTURN:
-                turn.text = "Enemy";
-                break;
-            default:
-                turn.text = "Battle Start";
-                break;
+            state = BattleState.LOSE;
+            StartCoroutine(EndBattle());
         }
+        else
+        {
+            state = BattleState.PLAYERTURN;
+            Debug.Log("Player's Turn");
+        }
+        PlayerStats.Instance.ReduceCooldowns();
+        UpdateUI();
+        isGuarding = false;
+    }
 
-        // Update enemy health text
-        if (enemyStats != null)
-        {
-            enemyHealth.text = $" {enemyStats.currentHp}/{enemyStats.maxHp} ";
-        }
-    }
 }

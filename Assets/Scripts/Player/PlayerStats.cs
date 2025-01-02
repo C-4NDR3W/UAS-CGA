@@ -21,7 +21,7 @@ public class PlayerStats : MonoBehaviour
     public TMP_Text coinText;
 
     void Awake()
-    {
+    {   
         Instance = this;
         DontDestroyOnLoad(gameObject); // Tetap ada di semua scene
         InitializeUI();
@@ -33,7 +33,7 @@ public class PlayerStats : MonoBehaviour
         InitializeStartingSkill();
     }
 
-    public void UseSkill(Skill skill, EnemyStats target = null)
+    public void UseSkill(Skill skill, BaseEnemyStats target = null)
     {
         if (skill == null)
         {
