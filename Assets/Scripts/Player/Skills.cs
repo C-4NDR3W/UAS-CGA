@@ -43,8 +43,9 @@ public class Skill
             case "Pound":
                 if (target != null)
                 {
-                    target.TakeDamage(basePower);
-                    Debug.Log($"Dealt {basePower} damage to the enemy (Tier {tier}).");
+                    int totalDamage = basePower + Mathf.RoundToInt(player.getLevel() * 1.25f) + Random.Range(0, 10);
+                    target.TakeDamage(totalDamage);
+                    Debug.Log($"Dealt {totalDamage} damage to the enemy (Tier {tier}).");
 
                     this.currentCooldown = cooldownTurns;
                 }

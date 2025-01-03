@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class BossBattleController : MonoBehaviour //largely a copy of BattleController with special boss-specific actions and smaller code overall(hopefully)
+public class BossBattleController : MonoBehaviour //largely a copy of BattleController with special boss-specific actions 
+//and smaller code overall(hopefully) //this did not happen
 { // yes i did not inherit BattleController
 
     private Vector3 originalPosition; // To store the original position of Pacman
@@ -36,7 +37,11 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
     private bool isInversed = false;
     private bool isSelectingNewSkill = false;
     private bool isGuarding = false;
-
+    private bool hasNotReversal = true; //alt names: has Bursted (Anime FGC), has Full Countered, has LimitBreak'd, has Supernova'd
+    private bool phase2 = false; //im sorry (not really) //god i wish im better at unity enough to modify the bossbattle music
+                                 // proposed boss battle music: Otherworld (FFX), Holy Orders ~Be Just or Be Dead~, Any doom soundtrack (Cyberdemon, Gladiator(?))
+                                 // i also wish i could modify a game over music (FFX Game Over)
+                                 //Nerd fun fact, the Spectogram of Cyberdemon has a secret message
     private void Start()
     {
         if (battleUIPanel == null)
@@ -100,6 +105,8 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         isIntimidated = false;
         isInversed = false;
         isSelectingNewSkill = false; //reset everything
+        hasNotReversal = true;
+        phase2 = false;
 
         battleUIPanel.SetActive(true);
         doctorUIPanel.SetActive(false);
@@ -250,17 +257,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         }
 
         UpdateUI();
-
-        if (bossStats != null && bossStats.isDead())
-        {
-            state = BattleState.WIN;
-            StartCoroutine(EndBattle());
-        }
-        else
-        {
-            StartCoroutine(EnemyTurn());
-            Debug.Log("Transferring to Enemy Turn: " + state);
-        }
+        StartCoroutine(EnemyTurn()); //due to having phase 2, death check is moved
     }
 
     private void OpenSkillPanel(bool selectNewSkill = false)
@@ -406,16 +403,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
         // Return to the default panel
         OpenDefaultPanel();
-        if (bossStats != null && bossStats.isDead())
-        {
-            state = BattleState.WIN;
-            StartCoroutine(EndBattle());
-        }
-        else
-        {
-            StartCoroutine(EnemyTurn());
-            Debug.Log("Transferring to Enemy Turn: " + state);
-        }
+        StartCoroutine(EnemyTurn()); //due to having phase 2, death check is added at start of EnemyTurn
     }
 
     IEnumerator PlayerGuard()
@@ -562,11 +550,29 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         }
     }
 
-    IEnumerator EnemyTurn() //UNFINISHED
+    IEnumerator EnemyTurn()
     {
         state = BattleState.ENEMYTURN;
-        UpdateUI();
 
+        if (bossStats.currentHp <= 0) //1st death check
+        {
+            if (!phase2)
+            {
+                phase2 = true;
+                bossStats.Phase2();
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy enters Phase 2!";
+                yield return new WaitForSeconds(1.5f);
+                dialogBox?.SetActive(false);
+            }
+            else
+            {
+                state = BattleState.WIN;
+                StartCoroutine(EndBattle());
+                yield break; // End the turn early if the boss is dead
+            }
+        }
+        UpdateUI();
         yield return new WaitForSeconds(1f);
 
 
@@ -576,21 +582,35 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
         if (missingHpPercentage >= 0.7f) // 70% missing HP
         {
-            healChance = 0.3f; // Higher chance to heal
+            healChance = 0.35f; // Higher chance to heal
         }
         else if (missingHpPercentage >= 0.15f) // 15% missing HP
         {
             healChance = 0.1f; // Lower chance to heal
         }
-        bool playerIsGuarding = isGuarding;
+        bool playerIsGuarding = isGuarding; // this bool is purely for setting chance
 
         // Adjust guard break chance
         float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
+        float reversalChance = 0f;
+
+        if (bossStats.currentHp <= bossStats.maxHp * 0.6f && bossStats.currentHp > bossStats.maxHp * 0.3f) // Between 50% and 30% HP
+        {
+            dialogBox.SetActive(true);
+            dialogText.text = "Warning! The boss is trying to do something at low HP!";
+            yield return new WaitForSeconds(2f);
+            dialogBox?.SetActive(false);
+        }
+        if (hasNotReversal && bossStats.currentHp <= bossStats.maxHp * 0.3f) // 30% or lower health
+        {
+            reversalChance = 0.5f + ((bossStats.maxHp * 0.3f - bossStats.currentHp) / (bossStats.maxHp * 0.3f)) * 0.5f; // Gradually increase up to 1.0
+        }
 
         // Randomly decide the action
         float actionRoll = Random.value;
         if (actionRoll < healChance)
         {
+            // Heal logic
             if (isInversed)
             {
                 bossStats.TakeDamage(bossStats.HealAmount());
@@ -606,14 +626,11 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
             }
 
             yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
+            dialogBox?.SetActive(false);
         }
-        else if (actionRoll < guardBreakChance) // Guard break with a dynamic low chance
+        else if (actionRoll < guardBreakChance + healChance) // Guard break with a dynamic low chance
         {
+            // Guard break logic
             if (isInversed)
             {
                 int damage = bossStats.GuardBreak(isGuarding);
@@ -628,24 +645,42 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
                 PlayerStats.Instance.TakeDamage(damage, false);
                 dialogBox.SetActive(true);
                 dialogText.text = "Enemy used Guard Break!";
-
             }
 
             yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
+            dialogBox?.SetActive(false);
         }
-        else // Default action is attack
+        else if (actionRoll < guardBreakChance + healChance + reversalChance) // Reversal attack
         {
+            // Reversal logic
+            hasNotReversal = false; // Ensure only one reversal per phase
             if (isInversed)
             {
                 int damage = bossStats.attackPower;
                 PlayerStats.Instance.InversedHeal(damage);
                 dialogBox.SetActive(true);
-                dialogText.text = "Enemy attacked while Inversed! You healed instead";
+                dialogText.text = "Enemy used Reversal while Inversed! You healed instead!";
+                isInversed = false;
+            }
+            else
+            {
+                PlayerStats.Instance.TakeDamage(bossStats.ReversalAttack(), playerIsGuarding); // Stronger attack
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy used Reversal!";
+            }
+
+            yield return new WaitForSeconds(1.5f);
+            dialogBox?.SetActive(false);
+        }
+        else // Default action is attack
+        {
+            // Attack logic
+            if (isInversed)
+            {
+                int damage = bossStats.attackPower;
+                PlayerStats.Instance.InversedHeal(damage);
+                dialogBox.SetActive(true);
+                dialogText.text = "Enemy attacked while Inversed! You healed instead!";
                 isInversed = false;
             }
             else
@@ -656,14 +691,22 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
             }
 
             yield return new WaitForSeconds(1.5f);
-
-            if (dialogBox != null)
-            {
-                dialogBox.SetActive(false);
-            }
+            dialogBox?.SetActive(false);
         }
 
-        yield return new WaitForSeconds(1f);
+        // Check if phase 2 should be triggered
+        if (bossStats.currentHp <= 0 && !phase2) //due to Inverse, there is a 2nd death check
+        {
+            phase2 = true;
+            bossStats.Phase2();
+            dialogBox.SetActive(true);
+            dialogText.text = "Enemy enters Phase 2!";
+
+            yield return new WaitForSeconds(1.5f);
+            dialogBox?.SetActive(false);
+        }
+
+        yield return new WaitForSeconds(0.5f);
 
         // Check if the player is defeated
         if (PlayerStats.Instance.currentHealth <= 0)
@@ -676,6 +719,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
             state = BattleState.PLAYERTURN;
             Debug.Log("Player's Turn");
         }
+
         PlayerStats.Instance.ReduceCooldowns();
         UpdateUI();
         isGuarding = false;

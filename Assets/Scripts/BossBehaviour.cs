@@ -62,7 +62,7 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
 
     private void RelocateForBattle(GameObject pacman)
     {
-        pacman.transform.position = new Vector3(15.322f, 27.94f, 0.49f);
+        pacman.transform.position = new Vector3(15.322f, 27.94f, 5.9f);
         pacman.transform.rotation = Quaternion.Euler(0f, 135f, 0f);
 
         transform.position = new Vector3(18.8f, 28.48f, 1.85f);

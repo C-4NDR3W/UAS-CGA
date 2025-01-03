@@ -7,11 +7,11 @@ public class BossStats : BaseEnemyStats
     public void Initialize(int playerLevel)
     {
         level = Mathf.Max(1, playerLevel + Random.Range(0, 3));
-        maxHp = 50 + (7 * level) + Random.Range(1, 10);
+        maxHp = 50 + (5 * level) + Random.Range(1, 10);
         currentHp = maxHp;
-        attackPower = 20 + (2 * level) + Random.Range(5, 10);
+        attackPower = 20 + Mathf.RoundToInt(1.1f * level) + Random.Range(5, 10);
         defenseModifier = 1 + Mathf.RoundToInt(1.5f * playerLevel);
-        xpReward = 100 + (Random.Range(100, playerLevel) * 3);
+        xpReward = 100 + (Random.Range(100, playerLevel) * 5);
     }
     public override int HealAmount()
     {
@@ -21,5 +21,13 @@ public class BossStats : BaseEnemyStats
     public int ReversalAttack()
     {
         return attackPower * 2;
+    }
+
+    public void Phase2()
+    {
+        level++;
+        maxHp = maxHp + (level * 5);
+        currentHp = maxHp;
+        attackPower = attackPower + level;
     }
 }

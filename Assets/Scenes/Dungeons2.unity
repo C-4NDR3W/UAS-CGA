@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -341,55 +341,55 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.78
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalPosition.y
       value: 27.733414
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalPosition.z
       value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8852237807667617800, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8852237807667617800, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8909528592693746965, guid: 49876348096b98740979389dd33720dc, type: 3}
+    - target: {fileID: 8909528592693746965, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
       propertyPath: m_Name
-      value: 'Battle Room '
+      value: BattleRoom
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 49876348096b98740979389dd33720dc, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: b37a940d12855f24481a8a0d3bce26ef, type: 3}
 --- !u!1 &393062742
 GameObject:
   m_ObjectHideFlags: 0
@@ -1310,6 +1310,7 @@ MonoBehaviour:
   menuUIPanel: {fileID: 0}
   battleUIPanel: {fileID: 1117563892}
   doctorUIPanel: {fileID: 1199136151}
+  gameOverUIPanel: {fileID: 0}
 --- !u!1 &957808567
 GameObject:
   m_ObjectHideFlags: 0
@@ -3301,13 +3302,12 @@ MonoBehaviour:
   dialogText: {fileID: 0}
   attackButton: {fileID: 1545564306}
   skillButton: {fileID: 957808569}
-  skillText: {fileID: 0}
   guardButton: {fileID: 1294596043}
   runButton: {fileID: 1865050702}
   playerButton: {fileID: 0}
   enemyHealth: {fileID: 0}
   turn: {fileID: 0}
-  skillButtonText: {fileID: 0}
+  gameOverUIPanel: {fileID: 0}
   inGameAudio: {fileID: 0}
 --- !u!4 &1999491226
 Transform:

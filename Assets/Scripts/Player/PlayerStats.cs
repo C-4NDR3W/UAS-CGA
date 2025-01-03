@@ -29,7 +29,7 @@ public class PlayerStats : MonoBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject); // Tetap ada di semua scene
-        xpToNextLevel = 25;
+        xpToNextLevel = 50;
         InitializeUI();
 
         currentHealth = maxHealth;
@@ -168,6 +168,11 @@ public class PlayerStats : MonoBehaviour
         {
             LevelUp();
         }
+    }
+
+    public int getLevel()
+    {
+        return level;
     }
 
     private void LevelUp()
