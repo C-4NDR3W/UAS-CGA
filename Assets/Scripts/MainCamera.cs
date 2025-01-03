@@ -16,7 +16,6 @@ public class MainCamera : MonoBehaviour
         {
             virtualCamera.Follow = player.transform;
             virtualCamera.LookAt = player.transform;
-            Debug.Log("Player found and camera follows");
         }
     }
 }

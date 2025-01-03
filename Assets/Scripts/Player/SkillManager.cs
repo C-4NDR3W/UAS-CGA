@@ -9,7 +9,7 @@ public class SkillManager : MonoBehaviour
     // Generate a skill based on type and tier
     public Skill GenerateSkill(string skillType, int tier)
     {
-        int basePower = skillType == "Heal" || skillType == "Pound" ? 15 * tier : 0;
+        int basePower = skillType == "Heal" || skillType == "Pound" ? 20 * tier : 0;
         int cooldown = 3;
         return new Skill(skillType, tier, basePower, cooldown, skillType);
     }

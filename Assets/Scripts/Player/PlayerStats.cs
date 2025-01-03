@@ -29,7 +29,7 @@ public class PlayerStats : MonoBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject); // Tetap ada di semua scene
-        xpToNextLevel = 50;
+        xpToNextLevel = 25;
         InitializeUI();
 
         currentHealth = maxHealth;
@@ -76,7 +76,7 @@ public class PlayerStats : MonoBehaviour
     public void RewardSkillAfterBattle()
     {
         SkillManager skillManager = FindObjectOfType<SkillManager>();
-        int currentTier = Mathf.FloorToInt(level / 5f) + 1;
+        int currentTier = Mathf.FloorToInt(level / 3f) + 1;
 
         // Generate a random skill from the available options
         Skill newSkill = skillManager.GenerateSkill(skillManager.GetRandomSkillName(), currentTier);
@@ -146,7 +146,7 @@ public class PlayerStats : MonoBehaviour
 
     public void AddCoins(float multiplier = 1.0f)
     {
-        int amount = Random.Range(1, 11);
+        int amount = Random.Range(3, 13);
         int totalReward = Mathf.CeilToInt(amount * multiplier);
         coins += totalReward;
         UpdateCoinUI();
@@ -179,7 +179,7 @@ public class PlayerStats : MonoBehaviour
     {
         level++;
         xpPoints -= xpToNextLevel;
-        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.25f); // Scale XP needed
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.5f); // Scale XP needed
         maxHealth += 20; // Increase HP on level up
         attackPower += 10; // Increase attack power
         currentHealth = maxHealth; // Fully heal the player

@@ -204,7 +204,10 @@ public class BattleController : MonoBehaviour // we really couldve made this som
         {
             SetupButton(runButton, skills, 3, selectNewSkill);
         }
-        SetupButton(runButton, skills, 3, selectNewSkill, isBackButton: true);
+        else
+        {
+            SetupButton(runButton, skills, 3, selectNewSkill, isBackButton: true);
+        }
     }
 
     private void SetupButton(Button button, List<Skill> skills, int index, bool selectNewSkill, bool isBackButton = false)

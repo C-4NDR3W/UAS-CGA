@@ -43,6 +43,7 @@ public class BaseEnemyStats : MonoBehaviour
     public void HealEnemy()
     {
         currentHp += HealAmount();
+        Debug.Log($"Healing target: {this.name}, Healing amount: {HealAmount()}");
         currentHp = Mathf.Clamp(currentHp, 0, maxHp);
     }
 

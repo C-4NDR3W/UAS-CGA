@@ -43,7 +43,7 @@ public class Skill
             case "Pound":
                 if (target != null)
                 {
-                    int totalDamage = basePower + Mathf.RoundToInt(player.getLevel() * 1.25f) + Random.Range(0, 10);
+                    int totalDamage = basePower + Mathf.RoundToInt(player.getLevel() * 1.25f) + Random.Range(0, 10) + (tier * 5);
                     target.TakeDamage(totalDamage);
                     Debug.Log($"Dealt {totalDamage} damage to the enemy (Tier {tier}).");
 
