@@ -14,7 +14,8 @@ public enum UIPanelState
 }
 
 
-public class BattleController : MonoBehaviour
+public class BattleController : MonoBehaviour // we really couldve made this some sort of base class 
+//so bossBattleController would be simpler, but i refuse.
 {
     //public static BattleController Instance;
 

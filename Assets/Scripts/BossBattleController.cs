@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 
 public class BossBattleController : MonoBehaviour //largely a copy of BattleController with special boss-specific actions and smaller code overall(hopefully)
-{
+{ // yes i did not inherit BattleController
 
     private Vector3 originalPosition; // To store the original position of Pacman
     private Quaternion originalRotation; // To store the original rotation of Pacman
@@ -75,7 +75,11 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
     public void SetupBattle(BossBehaviour boss)
     {
-        bossStats = gameObject.GetComponent<BossStats>(); // Local Variable
+        // Get the GameObject of the Boss
+        GameObject bossGameObject = boss.gameObject;
+
+        // Attempt to retrieve the BossStats component from the Boss GameObject
+        bossStats = bossGameObject.GetComponent<BossStats>();
         if (bossStats == null)
         {
             Debug.LogError("BossStats component not found on this GameObject!");
@@ -471,6 +475,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
     private IEnumerator EndBattle()
     {
+        BossBehaviour boss = FindObjectOfType<BossBehaviour>();
         if (state == BattleState.WIN)
         {
             dialogBox.SetActive(true);
@@ -486,7 +491,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
             }
             else
             {
-                PlayerStats.Instance.RewardSkillAfterBattle();
+                PlayerStats.Instance.RewardSkillAfterBattle(); // reward stuff specifically skill
                 isSelectingNewSkill = true;
                 List<Skill> skills = PlayerStats.Instance.skills;
                 dialogText.text = $"You cannot hold more than 3 skills, please select one to forget. You will obtain {skills[3].name} Tier {skills[3].tier}";
@@ -497,6 +502,12 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
                 {
                     yield return null; // Wait for the next frame
                 }
+            }
+
+            if (boss != null)
+            {
+                boss.SpawnTreasure();
+                boss.OpenStairs();
             }
         }
         else if (state == BattleState.LOSE)
@@ -514,7 +525,6 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         }
 
         battleUIPanel.SetActive(false);
-        BossBehaviour boss = FindObjectOfType<BossBehaviour>();
         if (boss != null)
         {
             currentBoss.OnBattleEnd();

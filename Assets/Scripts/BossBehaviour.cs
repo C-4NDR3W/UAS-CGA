@@ -62,11 +62,11 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
 
     private void RelocateForBattle(GameObject pacman)
     {
-        pacman.transform.position = new Vector3(15.322f, 27.94f, 4.538f);
+        pacman.transform.position = new Vector3(15.322f, 27.94f, 0.49f);
         pacman.transform.rotation = Quaternion.Euler(0f, 135f, 0f);
 
-        transform.position = new Vector3(18.25f, 28.17f, 1.85f);
-        transform.rotation = Quaternion.Euler(0f, -45f, 0f);
+        transform.position = new Vector3(18.8f, 28.48f, 1.85f);
+        transform.rotation = Quaternion.Euler(-90f, -45f, 0f);
     }
 
     public void OnBattleEnd()
@@ -74,10 +74,6 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
         // Stop any movement and cleanup logic for the boss
         canMove = false;
         isBattle = false;
-
-        // Spawn treasure and open stairs when the boss is defeated
-        SpawnTreasure();
-        OpenStairs();
 
         Destroy(gameObject);
     }
@@ -95,9 +91,20 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
         }
     }
 
-    private void OpenStairs()
+    public void OpenStairs()
     {
-        // Logic to open stairs (to be implemented)
-        Debug.Log("Stairs opened!");
+        Transform entrances = transform.Find("Entrances");
+        if (entrances == null)
+        {
+            Debug.LogError("Entrances GameObject not found!");
+            return;
+        }
+
+        foreach (Transform child in entrances)
+        {
+            Destroy(child.gameObject); // Or child.gameObject.SetActive(false)
+        }
+
+        Debug.Log("All stairs opened!");
     }
 }
