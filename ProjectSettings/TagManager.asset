@@ -9,6 +9,7 @@ TagManager:
   - Wall
   - Boss
   - PacmanDoctor
+  - Door
   layers:
   - Default
   - TransparentFX
