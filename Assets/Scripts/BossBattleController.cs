@@ -594,7 +594,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         float guardBreakChance = playerIsGuarding ? 0.15f : 0.1f;
         float reversalChance = 0f;
 
-        if (bossStats.currentHp <= bossStats.maxHp * 0.6f && bossStats.currentHp > bossStats.maxHp * 0.3f) // Between 50% and 30% HP
+        if (bossStats.currentHp <= bossStats.maxHp * 0.6f && bossStats.currentHp > bossStats.maxHp * 0.3f && hasNotReversal) // Between 50% and 30% HP
         {
             dialogBox.SetActive(true);
             dialogText.text = "Warning! The boss is trying to do something at low HP!";
