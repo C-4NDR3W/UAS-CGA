@@ -273,7 +273,10 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         {
             SetupButton(runButton, skills, 3, selectNewSkill);
         }
-        SetupButton(runButton, skills, 3, selectNewSkill, isBackButton: true);
+        else
+        {
+            SetupButton(runButton, skills, 3, selectNewSkill, isBackButton: true);
+        }
     }
 
     private void SetupButton(Button button, List<Skill> skills, int index, bool selectNewSkill, bool isBackButton = false)
