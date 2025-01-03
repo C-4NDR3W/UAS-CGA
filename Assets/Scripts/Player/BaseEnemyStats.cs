@@ -19,6 +19,7 @@ public class BaseEnemyStats : MonoBehaviour
     {
         int defenseValue = defenseModifier + Random.Range(0, 1 * level);
         int takenDamage = Mathf.Max(damage - defenseValue, 1);
+        takenDamage += Random.Range(1, level);
         currentHp -= takenDamage;
         currentHp = Mathf.Clamp(currentHp, 0, maxHp);
     }
