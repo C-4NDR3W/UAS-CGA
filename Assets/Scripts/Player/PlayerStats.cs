@@ -185,7 +185,7 @@ public class PlayerStats : MonoBehaviour
     private IEnumerator ShowLevelUpDialog()
     {
         dialogBox.SetActive(true);
-        dialogText.SetText("Level Up");
+        dialogText.SetText("You Leveled Up! Max Health and Attack Increased.");
 
         yield return new WaitForSeconds(1.5f); // Wait for 1.5 seconds
 

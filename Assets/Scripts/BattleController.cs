@@ -625,6 +625,10 @@ public class BattleController : MonoBehaviour
     {
         enemyStats = enemy;
         state = BattleState.START;
+        isGuarding = false;
+        isIntimidated = false;
+        isInversed = false;
+        isSelectingNewSkill = false; //reset everything
 
         battleUIPanel.SetActive(true);
         doctorUIPanel.SetActive(false);

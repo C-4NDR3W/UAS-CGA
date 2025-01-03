@@ -90,9 +90,12 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
     public IEnumerator StartBattle(BossStats bossStatsComponent, BossBehaviour boss)
     {
-
         this.currentBoss = boss;
         state = BattleState.START; //ensures it starts on the START state
+        isGuarding = false;
+        isIntimidated = false;
+        isInversed = false;
+        isSelectingNewSkill = false; //reset everything
 
         battleUIPanel.SetActive(true);
         doctorUIPanel.SetActive(false);
