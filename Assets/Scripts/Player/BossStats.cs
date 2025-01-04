@@ -20,7 +20,7 @@ public class BossStats : BaseEnemyStats
 
     public int ReversalAttack()
     {
-        return attackPower * 2;
+        return attackPower * 2 + Random.Range(1, attackPower);
     }
 
     public void Phase2()

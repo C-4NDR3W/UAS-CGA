@@ -659,7 +659,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
             hasNotReversal = false; // Ensure only one reversal per phase
             if (isInversed)
             {
-                int damage = bossStats.attackPower;
+                int damage = bossStats.ReversalAttack();
                 PlayerStats.Instance.InversedHeal(damage);
                 dialogBox.SetActive(true);
                 dialogText.text = "Enemy used Reversal while Inversed! You healed instead!";
