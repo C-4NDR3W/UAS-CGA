@@ -61,7 +61,12 @@ public class BattleController : MonoBehaviour // we really couldve made this som
             battleUIPanel.SetActive(false);
         }
 
-        dialogBox = battleUIPanel.transform.Find("Player TextBox").gameObject;
+        if (battleUIPanel == null)
+        {
+            Debug.LogError("battleUIPanel is null! Check InGameUI.Instance.battleUIPanel.");
+        }
+
+        dialogBox = battleUIPanel.transform.Find("Player TextBox").gameObject; //this triggers null reference when switching floors, but we dont know exactly why nor does it break the game.
         dialogText = dialogBox.transform.Find("Player Text").GetComponent<TMP_Text>();
 
         if (dialogBox != null)
@@ -71,9 +76,6 @@ public class BattleController : MonoBehaviour // we really couldve made this som
 
         enemyHealth = battleUIPanel.transform.Find("Enemy Health").GetComponent<TMP_Text>();
         turn = battleUIPanel.transform.Find("Turn").GetComponent<TMP_Text>();
-
-
-
         inGameAudio = FindObjectOfType<InGameAudio>();
     }
 

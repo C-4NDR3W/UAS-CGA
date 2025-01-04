@@ -54,7 +54,7 @@ public class TreasureReward : MonoBehaviour
     {
         int missingHp = PlayerStats.Instance.maxHealth - PlayerStats.Instance.currentHealth;
         float healChance = 0.25f; //0.25
-        float coinChance = 0.25f; //make space for other features //0.5
+        float coinChance = 0.25f; //0.5
         float mimicChance = 0.25f; //a sudden enemy appears! //0.75
         float xpChance = 0.15f; //0.90
         float permanentAtkBuffChance = 0.05f;
