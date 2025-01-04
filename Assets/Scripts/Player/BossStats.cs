@@ -7,7 +7,7 @@ public class BossStats : BaseEnemyStats
     public void Initialize(int playerLevel)
     {
         level = Mathf.Max(1, playerLevel + Random.Range(0, 3));
-        maxHp = 50 + (8 * level) + Random.Range(1, 10);
+        maxHp = 50 + (6 * level) + Random.Range(1, 10);
         currentHp = maxHp;
         attackPower = 15 + Mathf.RoundToInt(1.5f * level) + Random.Range(5, 10);
         defenseModifier = 1 + Mathf.RoundToInt(1.5f * playerLevel);
