@@ -698,7 +698,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         }
 
         // Check if phase 2 should be triggered
-        if (bossStats.currentHp <= 0 && !phase2) //due to Inverse, there is a 2nd death check
+        if (bossStats.isDead() && !phase2) //due to Inverse, there is a 2nd death check
         {
             phase2 = true;
             bossStats.Phase2();
@@ -707,6 +707,11 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
             yield return new WaitForSeconds(1.5f);
             dialogBox?.SetActive(false);
+        }
+        else if (bossStats.isDead())
+        {
+            state = BattleState.WIN;
+            StartCoroutine(EndBattle());
         }
 
         yield return new WaitForSeconds(0.5f);
