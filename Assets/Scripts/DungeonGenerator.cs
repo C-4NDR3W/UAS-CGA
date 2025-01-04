@@ -1,41 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject pacmanPrefab;
-    void SpawnOrRelocatePacman()
-    {
-        GameObject existingPacman = GameObject.FindGameObjectWithTag("Pacman");
-        Vector3 spawnPosition = GetSpawnPosition();
+    public GameObject pacmanDoctorPrefab;
+    public GameObject[] ghostPrefabs; // Array untuk semua prefab ghost
+    public GameObject treasureChestPrefab;
 
-        if (existingPacman != null)
-        {
-            existingPacman.transform.position = spawnPosition;
-        }
-        else
-        {
-            GameObject newPacman = Instantiate(pacmanPrefab, spawnPosition, Quaternion.identity);
-            newPacman.tag = "Pacman";
-        }
-    }
+    public int numberOfGhosts = 4;
 
-    Vector3 GetSpawnPosition()
-    {
-        for (int i = 0; i < size.x; i++)
-        {
-            for (int j = 0; j < size.y; j++)
-            {
-                Cell currentCell = board[(i + j * size.x)];
-                if (currentCell.visited)
-                {
-                    return new Vector3(i * offset.x, 0, -j * offset.y);
-                }
-            }
-        }
-        return Vector3.zero;
-    }
+    public Vector2Int size;
+    public int startPos = 0;
+    public Rule[] rooms;
+    public Rule stairsRoom;
+    public Vector2 offset;
+
+    private List<Cell> board;
+
+    public bool isBattleScene = false;
+    Vector3 pacmanSpawnPosition;
 
     public class Cell
     {
@@ -49,13 +35,10 @@ public class DungeonGenerator : MonoBehaviour
         public GameObject room;
         public Vector2Int minPosition;
         public Vector2Int maxPosition;
-
         public bool obligatory;
 
         public int ProbabilityOfSpawning(int x, int y)
         {
-            // 0 - cannot spawn 1 - can spawn 2 - HAS to spawn
-
             if (x >= minPosition.x && x <= maxPosition.x && y >= minPosition.y && y <= maxPosition.y)
             {
                 return obligatory ? 2 : 1;
@@ -63,24 +46,123 @@ public class DungeonGenerator : MonoBehaviour
 
             return 0;
         }
-
     }
 
-    public Vector2Int size;
-    public int startPos = 0;
-    public Rule[] rooms;
-    public Vector2 offset;
-
-    List<Cell> board;
-
-    // Start is called before the first frame update
     void Start()
     {
         MazeGenerator();
     }
 
+    void MazeGenerator()
+    {
+        board = new List<Cell>();
+
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                board.Add(new Cell());
+            }
+        }
+
+        int currentCell = startPos;
+        Stack<int> path = new Stack<int>();
+        int k = 0;
+
+        while (k < 1000)
+        {
+            k++;
+            board[currentCell].visited = true;
+
+            if (currentCell == board.Count - 1)
+            {
+                break;
+            }
+
+            List<int> neighbors = CheckNeighbors(currentCell);
+
+            if (neighbors.Count == 0)
+            {
+                if (path.Count == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    currentCell = path.Pop();
+                }
+            }
+            else
+            {
+                path.Push(currentCell);
+                int newCell = neighbors[Random.Range(0, neighbors.Count)];
+
+                if (newCell > currentCell)
+                {
+                    if (newCell - 1 == currentCell)
+                    {
+                        board[currentCell].status[2] = true;
+                        currentCell = newCell;
+                        board[currentCell].status[3] = true;
+                    }
+                    else
+                    {
+                        board[currentCell].status[1] = true;
+                        currentCell = newCell;
+                        board[currentCell].status[0] = true;
+                    }
+                }
+                else
+                {
+                    if (newCell + 1 == currentCell)
+                    {
+                        board[currentCell].status[3] = true;
+                        currentCell = newCell;
+                        board[currentCell].status[2] = true;
+                    }
+                    else
+                    {
+                        board[currentCell].status[0] = true;
+                        currentCell = newCell;
+                        board[currentCell].status[1] = true;
+                    }
+                }
+            }
+        }
+
+        GenerateDungeon();
+    }
+
+    List<int> CheckNeighbors(int cell)
+    {
+        List<int> neighbors = new List<int>();
+
+        if (cell - size.x >= 0 && !board[cell - size.x].visited)
+        {
+            neighbors.Add(cell - size.x);
+        }
+
+        if (cell + size.x < board.Count && !board[cell + size.x].visited)
+        {
+            neighbors.Add(cell + size.x);
+        }
+
+        if ((cell + 1) % size.x != 0 && !board[cell + 1].visited)
+        {
+            neighbors.Add(cell + 1);
+        }
+
+        if (cell % size.x != 0 && !board[cell - 1].visited)
+        {
+            neighbors.Add(cell - 1);
+        }
+
+        return neighbors;
+    }
+
     void GenerateDungeon()
     {
+        List<Vector3> roomCenters = new List<Vector3>();
 
         for (int i = 0; i < size.x; i++)
         {
@@ -119,134 +201,245 @@ public class DungeonGenerator : MonoBehaviour
                         }
                     }
 
-
                     var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
-                    newRoom.name += " " + i + "-" + j;
+                    newRoom.name += $" {i}-{j}";
 
+                    Vector3 roomCenter = new Vector3(
+                    (rooms[randomRoom].minPosition.x + rooms[randomRoom].maxPosition.x) / 2.0f * offset.x,
+                    0,
+                    -(rooms[randomRoom].minPosition.y + rooms[randomRoom].maxPosition.y) / 2.0f * offset.y);
+                    roomCenters.Add(roomCenter);
                 }
             }
         }
 
+        PlaceStairsRoom();
         SpawnOrRelocatePacman();
+        SpawnGhosts();
+        SpawnPacmanDoctor();
+        SpawnTreasureChests();
     }
 
-    void MazeGenerator()
+    void PlaceStairsRoom()
     {
-        board = new List<Cell>();
+        if (stairsRoom == null || stairsRoom.room == null)
+        {
+            Debug.LogError("Stairs room prefab is not assigned!");
+            return;
+        }
+
+        List<int> eligibleCells = new List<int>();
+        for (int i = 0; i < board.Count; i++)
+        {
+            if (board[i].visited && i != startPos)
+            {
+                eligibleCells.Add(i);
+            }
+        }
+
+        if (eligibleCells.Count == 0)
+        {
+            Debug.LogError("No eligible cells for stairs room!");
+            return;
+        }
+
+        int randomIndex = eligibleCells[Random.Range(0, eligibleCells.Count)];
+        Vector2Int position = new Vector2Int(randomIndex % size.x, randomIndex / size.x);
+
+        var stairsRoomInstance = Instantiate(stairsRoom.room, new Vector3(position.x * offset.x, 0, -position.y * offset.y), Quaternion.identity, transform);
+        stairsRoomInstance.name = "Stairs Room";
+
+        RoomBehaviour roomBehaviour = stairsRoomInstance.GetComponent<RoomBehaviour>();
+        if (roomBehaviour != null)
+        {
+            bool[] status = new bool[4];
+            status[0] = randomIndex - size.x >= 0 && board[randomIndex - size.x].visited;
+            status[1] = randomIndex + size.x < board.Count && board[randomIndex + size.x].visited;
+            status[2] = (randomIndex + 1) % size.x != 0 && board[randomIndex + 1].visited;
+            status[3] = randomIndex % size.x != 0 && board[randomIndex - 1].visited;
+
+            roomBehaviour.UpdateRoom(status);
+        }
+        else
+        {
+            Debug.LogError("Stairs room prefab is missing a RoomBehaviour component!");
+        }
+    }
+
+    void SpawnOrRelocatePacman()
+    {
+        GameObject existingPacman = GameObject.FindGameObjectWithTag("Pacman");
+        Vector3 pacmanSpawnPosition = GetSpawnPosition();
+
+        if (existingPacman != null)
+        {
+            existingPacman.transform.position = pacmanSpawnPosition;
+        }
+        else
+        {
+            GameObject newPacman = Instantiate(pacmanPrefab, pacmanSpawnPosition, Quaternion.identity);
+            newPacman.tag = "Pacman";
+        }
+    }
+
+    Vector3 GetSpawnPosition()
+    {
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    return new Vector3(i * offset.x, 0, -j * offset.y);
+                }
+            }
+        }
+        return Vector3.zero;
+    }
+
+    void SpawnGhosts()
+    {
+        List<Vector3> spawnPositions = new List<Vector3>();
 
         for (int i = 0; i < size.x; i++)
         {
             for (int j = 0; j < size.y; j++)
             {
-                board.Add(new Cell());
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
+                }
             }
         }
 
-        int currentCell = startPos;
-
-        Stack<int> path = new Stack<int>();
-
-        int k = 0;
-
-        while (k < 1000)
+        for (int k = 0; k < numberOfGhosts; k++)
         {
-            k++;
+            if (spawnPositions.Count == 0) break;
 
-            board[currentCell].visited = true;
+            int randomIndex = Random.Range(0, spawnPositions.Count);
+            Vector3 spawnPosition = spawnPositions[randomIndex];
 
-            if (currentCell == board.Count - 1)
+            if (spawnPosition == pacmanSpawnPosition)
             {
-                break;
+                // Skip this spawn position if it's the same as Pacman's
+                spawnPositions.RemoveAt(randomIndex);
+                k--; // Decrement k to retry spawning this ghost
+                continue;
             }
 
-            //Check the cell's neighbors
-            List<int> neighbors = CheckNeighbors(currentCell);
+            spawnPositions.RemoveAt(randomIndex);
 
-            if (neighbors.Count == 0)
+            if (ghostPrefabs.Length > 0)
             {
-                if (path.Count == 0)
+                int randomGhostIndex = Random.Range(0, ghostPrefabs.Length);
+                GameObject ghost = Instantiate(ghostPrefabs[randomGhostIndex], spawnPosition, Quaternion.identity);
+
+                GhostBehaviour ghostBehaviour = ghost.GetComponent<GhostBehaviour>();
+                if (ghostBehaviour != null)
                 {
-                    break;
-                }
-                else
-                {
-                    currentCell = path.Pop();
+                    if (isBattleScene)
+                    {
+                        ghostBehaviour.enabled = false;
+                    }
                 }
             }
-            else
-            {
-                path.Push(currentCell);
-
-                int newCell = neighbors[Random.Range(0, neighbors.Count)];
-
-                if (newCell > currentCell)
-                {
-                    //down or right
-                    if (newCell - 1 == currentCell)
-                    {
-                        board[currentCell].status[2] = true;
-                        currentCell = newCell;
-                        board[currentCell].status[3] = true;
-                    }
-                    else
-                    {
-                        board[currentCell].status[1] = true;
-                        currentCell = newCell;
-                        board[currentCell].status[0] = true;
-                    }
-                }
-                else
-                {
-                    //up or left
-                    if (newCell + 1 == currentCell)
-                    {
-                        board[currentCell].status[3] = true;
-                        currentCell = newCell;
-                        board[currentCell].status[2] = true;
-                    }
-                    else
-                    {
-                        board[currentCell].status[0] = true;
-                        currentCell = newCell;
-                        board[currentCell].status[1] = true;
-                    }
-                }
-
-            }
-
         }
-        GenerateDungeon();
     }
 
-    List<int> CheckNeighbors(int cell)
+    void SpawnPacmanDoctor()
     {
-        List<int> neighbors = new List<int>();
+        List<Vector3> spawnPositions = new List<Vector3>();
 
-        //check up neighbor
-        if (cell - size.x >= 0 && !board[(cell - size.x)].visited)
+        for (int i = 0; i < size.x; i++)
         {
-            neighbors.Add((cell - size.x));
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    spawnPositions.Add(new Vector3(i * offset.x, 0.5f, -j * offset.y));
+                }
+            }
         }
 
-        //check down neighbor
-        if (cell + size.x < board.Count && !board[(cell + size.x)].visited)
+        if (spawnPositions.Count > 0)
         {
-            neighbors.Add((cell + size.x));
-        }
+            int randomIndex = Random.Range(0, spawnPositions.Count);
+            Vector3 spawnPosition = spawnPositions[randomIndex];
 
-        //check right neighbor
-        if ((cell + 1) % size.x != 0 && !board[(cell + 1)].visited)
-        {
-            neighbors.Add((cell + 1));
+            GameObject pacamanDoctor = Instantiate(pacmanDoctorPrefab, spawnPosition, Quaternion.identity);
         }
-
-        //check left neighbor
-        if (cell % size.x != 0 && !board[(cell - 1)].visited)
-        {
-            neighbors.Add((cell - 1));
-        }
-
-        return neighbors;
     }
+
+    void SpawnTreasureChests()
+    {
+        int minimumChests = 2;
+        // Create a list of spawnable positions
+        List<Vector3> spawnPositions = new List<Vector3>();
+
+        // Populate the list with visited cells
+        for (int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                Cell currentCell = board[(i + j * size.x)];
+                if (currentCell.visited)
+                {
+                    spawnPositions.Add(new Vector3(i * offset.x, 0, -j * offset.y));
+                }
+            }
+        }
+
+        // Remove occupied positions (Pacman and Pacman Doctor positions)
+        HashSet<Vector3> occupiedPositions = new HashSet<Vector3>();
+
+        // Add Pacman's position
+        GameObject pacman = GameObject.FindGameObjectWithTag("Pacman");
+        if (pacman != null)
+        {
+            occupiedPositions.Add(pacman.transform.position);
+        }
+
+        // Add Pacman Doctor's position
+        GameObject pacmanDoctor = GameObject.FindGameObjectWithTag("PacmanDoctor");
+        if (pacmanDoctor != null)
+        {
+            occupiedPositions.Add(pacmanDoctor.transform.position);
+        }
+
+        // Remove all occupied positions from the spawnable positions list
+        spawnPositions.RemoveAll(pos => occupiedPositions.Contains(pos));
+
+        // Ensure there are valid positions available
+        if (spawnPositions.Count < minimumChests)
+        {
+            Debug.LogError($"Not enough valid positions to spawn {minimumChests} treasure chests!");
+            return;
+        }
+
+        // Shuffle the spawn positions for randomness
+        Shuffle(spawnPositions);
+
+        // Spawn the required number of treasure chests
+        for (int i = 0; i < minimumChests; i++)
+        {
+            Instantiate(treasureChestPrefab, spawnPositions[i], Quaternion.identity);
+        }
+    }
+
+    // Utility function to shuffle a list
+    void Shuffle<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
+        }
+    }
+
 }

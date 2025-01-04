@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pacman
+  - Ghost
+  - Wall
+  - Boss
+  - PacmanDoctor
+  - Door
   layers:
   - Default
   - TransparentFX
