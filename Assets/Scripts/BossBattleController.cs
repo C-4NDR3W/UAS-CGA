@@ -458,6 +458,7 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
         else
         {
             state = BattleState.ENEMYTURN;
+            StartCoroutine(EnemyTurn());
         }
 
         UpdateUI();

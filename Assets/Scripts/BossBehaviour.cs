@@ -94,25 +94,27 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
 
     public void OpenStairs()
     {
-        Transform stairsRoomBoss = transform.Find("StairsRoomBoss");
-        if (stairsRoomBoss == null)
+        // Find StairsRoomBoss by name
+        GameObject stairsRoomBossObject = GameObject.Find("StairsRoomBoss");
+        if (stairsRoomBossObject == null)
         {
-            Debug.LogError("StairsRoomBoss GameObject not found!");
+            Debug.LogError("StairsRoomBoss GameObject not found in the scene!");
             return;
         }
 
-        Transform entrances = stairsRoomBoss.Find("Entrances");
+        // Find the Entrances child within StairsRoomBoss
+        Transform entrances = stairsRoomBossObject.transform.Find("Entrances");
         if (entrances == null)
         {
-            Debug.LogError("Entrances GameObject not found!");
+            Debug.LogError("Entrances GameObject not found in StairsRoomBoss!");
             return;
         }
 
         foreach (Transform child in entrances)
         {
-            Destroy(child.gameObject); // Or child.gameObject.SetActive(false)
+            Destroy(child.gameObject);
         }
 
-        Debug.Log("All stairs opened!");
+        Debug.Log("Some walls and doors opened!");
     }
 }
