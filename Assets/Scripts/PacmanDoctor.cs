@@ -87,7 +87,7 @@ public class PacmanDoctor : MonoBehaviour
 
         if (cost > 0)
         {
-            dialogText.text = $"Do you want to heal for {cost}?";
+            dialogText.text = $"Do you want to heal for {cost} coins?";
             dialogBox.SetActive(true);
             isQuestionDialog = true;
         }
