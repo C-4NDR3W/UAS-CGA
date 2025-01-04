@@ -728,15 +728,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   treasureChest: {fileID: 919132149155446097, guid: 9b31a0891adbde34fbe5b3136078354c, type: 3}
   state: 0
-  battleUIPanel: {fileID: 1117563892}
-  doctorUIPanel: {fileID: 1199136151}
+  battleUIPanel: {fileID: 0}
+  doctorUIPanel: {fileID: 0}
   dialogBox: {fileID: 0}
   dialogText: {fileID: 0}
   attackButton: {fileID: 1545564306}
   skillButton: {fileID: 957808569}
   guardButton: {fileID: 1294596043}
   runButton: {fileID: 1865050702}
-  playerButton: {fileID: 0}
   enemyHealth: {fileID: 0}
   turn: {fileID: 0}
   gameOverUIPanel: {fileID: 0}
@@ -1504,6 +1503,7 @@ MonoBehaviour:
   battleUIPanel: {fileID: 1117563892}
   doctorUIPanel: {fileID: 1199136151}
   gameOverUIPanel: {fileID: 0}
+  floor: {fileID: 0}
 --- !u!1 &957808567
 GameObject:
   m_ObjectHideFlags: 0

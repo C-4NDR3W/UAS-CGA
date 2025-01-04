@@ -35,7 +35,6 @@ public class BattleController : MonoBehaviour // we really couldve made this som
     public Button skillButton;
     public Button guardButton;
     public Button runButton;
-    public Button playerButton;
     public TMP_Text enemyHealth;
     public TMP_Text turn;
 
@@ -414,6 +413,7 @@ public class BattleController : MonoBehaviour // we really couldve made this som
         else
         {
             state = BattleState.ENEMYTURN;
+            StartCoroutine(EnemyTurn());
         }
 
         UpdateUI();

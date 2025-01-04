@@ -74,6 +74,7 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
         // Stop any movement and cleanup logic for the boss
         canMove = false;
         isBattle = false;
+        Debug.Log("OnBattleEnd called: Destroying boss GameObject.");
 
         Destroy(gameObject);
     }
@@ -87,13 +88,20 @@ public class BossBehaviour : MonoBehaviour //this class is a modified version of
     {
         if (treasurePrefab != null)
         {
-            Instantiate(treasurePrefab, transform.position, Quaternion.identity);
+            Instantiate(treasurePrefab, originalPosition, Quaternion.identity);
         }
     }
 
     public void OpenStairs()
     {
-        Transform entrances = transform.Find("Entrances");
+        Transform stairsRoomBoss = transform.Find("StairsRoomBoss");
+        if (stairsRoomBoss == null)
+        {
+            Debug.LogError("StairsRoomBoss GameObject not found!");
+            return;
+        }
+
+        Transform entrances = stairsRoomBoss.Find("Entrances");
         if (entrances == null)
         {
             Debug.LogError("Entrances GameObject not found!");

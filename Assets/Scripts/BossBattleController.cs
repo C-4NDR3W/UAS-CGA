@@ -93,18 +93,17 @@ public class BossBattleController : MonoBehaviour //largely a copy of BattleCont
 
         int playerLevel = PlayerStats.Instance.level;
         bossStats.Initialize(playerLevel);
-
         StartCoroutine(StartBattle(bossStats, boss)); // Pass the local variable
     }
 
     public IEnumerator StartBattle(BossStats bossStatsComponent, BossBehaviour boss)
     {
         this.currentBoss = boss;
-        state = BattleState.START; //ensures it starts on the START state
+        state = BattleState.START; // Ensures it starts on the START state
         isGuarding = false;
         isIntimidated = false;
         isInversed = false;
-        isSelectingNewSkill = false; //reset everything
+        isSelectingNewSkill = false; // Reset everything
         hasNotReversal = true;
         phase2 = false;
 
