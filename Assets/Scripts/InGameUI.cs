@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using TMPro;
 
 public class InGameUI : MonoBehaviour
 {
@@ -11,6 +11,7 @@ public class InGameUI : MonoBehaviour
     public GameObject battleUIPanel;
     public GameObject doctorUIPanel;
     public GameObject gameOverUIPanel;
+    public TMP_Text floor;
 
     void Awake()
     {
@@ -30,6 +31,7 @@ public class InGameUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             menuUIPanel.SetActive(!menuUIPanel.activeSelf);
+            UpdateFloorText();
         }
     }
     public void OnMainMenuButtonPressed()
@@ -47,6 +49,20 @@ public class InGameUI : MonoBehaviour
         DestroyAllDontDestroyOnLoadObjects();
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
         yield return 1.5f;
+    }
+
+    public void UpdateFloorText()
+    {
+        int buildIndex = SceneManager.GetActiveScene().buildIndex;
+
+        if (buildIndex == 4)
+        {
+            floor.text = "Floor - Boss";
+        }
+        else
+        {
+            floor.text = $"Floor - {buildIndex}";
+        }
     }
 
     public void DestroyAllDontDestroyOnLoadObjects()
