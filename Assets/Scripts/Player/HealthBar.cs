@@ -18,4 +18,10 @@ public class HealthBar : MonoBehaviour
     {
         slider.value = health;
     }
+
+    public void IncreaseMaxHealth(int newMaxHealth)
+    {
+        slider.maxValue = newMaxHealth;
+        slider.value = Mathf.Min(slider.value, newMaxHealth);
+    }
 }

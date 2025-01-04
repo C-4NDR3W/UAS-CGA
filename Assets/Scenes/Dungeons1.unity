@@ -3406,7 +3406,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1117563893
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4471,7 +4471,6 @@ MonoBehaviour:
   skillButton: {fileID: 957808569}
   guardButton: {fileID: 1294596043}
   runButton: {fileID: 1865050702}
-  playerButton: {fileID: 0}
   enemyHealth: {fileID: 0}
   turn: {fileID: 0}
   gameOverUIPanel: {fileID: 888510366}

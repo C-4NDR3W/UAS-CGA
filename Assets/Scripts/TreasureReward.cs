@@ -66,7 +66,7 @@ public class TreasureReward : MonoBehaviour
         if (actionRoll < healChance)
         {
             // Heal outcome
-            PlayerStats.Instance.currentHealth = Mathf.Min(PlayerStats.Instance.currentHealth + missingHp, PlayerStats.Instance.maxHealth);
+            PlayerStats.Instance.Heal(0);
             Debug.Log("Healed for " + missingHp + " HP");
             dialogText.text = "You got healed!";
         }
@@ -108,6 +108,7 @@ public class TreasureReward : MonoBehaviour
         else
         {
             PlayerStats.Instance.maxHealth += 10; // Assuming permanentMaxHealth exists
+            PlayerStats.Instance.healthBar.IncreaseMaxHealth(PlayerStats.Instance.maxHealth);
             Debug.Log("Your max health permanently increased by 10!");
             dialogText.text = "Your max health permanently increased by 10!";
         }

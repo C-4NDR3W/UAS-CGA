@@ -182,7 +182,8 @@ public class PlayerStats : MonoBehaviour
         xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.5f); // Scale XP needed
         maxHealth += 20; // Increase HP on level up
         attackPower += 10; // Increase attack power
-        currentHealth = maxHealth; // Fully heal the player
+        healthBar.IncreaseMaxHealth(maxHealth);
+        PlayerStats.Instance.Heal(0); // Fully heal the player
 
         StartCoroutine(ShowLevelUpDialog());
     }
